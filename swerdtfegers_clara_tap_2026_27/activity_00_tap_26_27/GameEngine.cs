@@ -9,6 +9,7 @@ namespace activity_00_tap_26_27
     {
         private const float FIXED_FRAME_TIME = 20 / 1000.0f;
 
+
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
         private readonly List<GameObject> _gameObjectTable = new List<GameObject>();
@@ -21,6 +22,8 @@ namespace activity_00_tap_26_27
         {
             _stopwatch.Start();
 
+            float lag = 0.0f;
+
             float last_time = GetCurrentTime();
 
             while (!_shouldQuit)
@@ -30,7 +33,12 @@ namespace activity_00_tap_26_27
 
                 ProcessInput();
 
-                //FixedUpdate(FIXED_FRAME_TIME);
+                while(lag >= FIXED_FRAME_TIME)
+                {
+                    FixedUpdate(FIXED_FRAME_TIME);
+                    lag -= FIXED_FRAME_TIME;
+                }
+
 
                 Update(elapsed_time);
 
