@@ -7,6 +7,22 @@
 *.obj
 *.elf
 
+# Dossiers de compilation
+[Bb]in/
+[Oo]bj/
+
+# Dossier de configuration des IDE
+.vs/
+.idea/
+
+# Fichiers utilisateur
+*.user
+*.suo
+
+# Fichiers de log, cache, etc.
+*.log
+*.cache
+
 # Linker output
 *.ilk
 *.map
