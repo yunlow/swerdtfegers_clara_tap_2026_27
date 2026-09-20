@@ -73,6 +73,11 @@ namespace activity_00_tap_26_27.Presentation
             {
                 ConsoleKeyInfo player_command = Console.ReadKey(true);
 
+                bool is_valid_command = player_command.Key == ConsoleKey.UpArrow ||
+                                        player_command.Key == ConsoleKey.DownArrow ||
+                                        player_command.Key == ConsoleKey.Enter ||
+                                        player_command.Key == ConsoleKey.Escape;
+
                 GameActionType action = GameActionType.QUIT;
 
                 if (ConsoleKey.UpArrow == player_command.Key)
@@ -90,6 +95,11 @@ namespace activity_00_tap_26_27.Presentation
                 else if (ConsoleKey.Escape == player_command.Key)
                 {
                     action = GameActionType.CANCEL;
+                }
+
+                if(is_valid_command)
+                {
+                    _eventManager.TriggerEvent(new GameActionGameEvent());
                 }
             }
         }
