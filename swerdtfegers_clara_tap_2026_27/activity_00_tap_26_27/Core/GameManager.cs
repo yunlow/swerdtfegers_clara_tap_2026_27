@@ -23,6 +23,9 @@ namespace activity_00_tap_26_27.Core
             _eventManager.RegisterToEvent<RegisterGameObjectGameEvent>(OnRegisterGameObject);
             _eventManager.RegisterToEvent<UnregisterGameObjectGameEvent>(OnUnregisterGameObject);
             _eventManager.RegisterToEvent<GameActionGameEvent>(OnGameAction);
+
+            World world = new World(_eventManager);
+            _currentLocation = world.BuildWorld();
         }
 
         private void OnRegisterGameObject(IGameEvent game_event)
