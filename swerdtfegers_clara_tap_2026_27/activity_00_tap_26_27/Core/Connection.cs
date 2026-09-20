@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace activity_00_tap_26_27.Core
 {
-    public class LocationLink
+    public class Connection
     {
         private readonly GameObject _destination;
         private readonly float _duration;
 
-        public LocationLink(GameObject destination, float duration)
+        public Connection(GameObject destination, float duration)
         {
             _destination = destination;
             _duration = duration;

@@ -6,8 +6,9 @@ namespace activity_00_tap_26_27.Presentation
     {
         private struct Pixel
         {
-            public char Character;
-            public ConsoleColor Color;
+            public char _character;
+            public ConsoleColor _color;
+            public ConsoleColor _backgroundColor;
         }
 
         private Pixel[,] _currentBuffer;
@@ -21,7 +22,7 @@ namespace activity_00_tap_26_27.Presentation
             _height = Console.WindowHeight;
             _currentBuffer = new Pixel[_width, _height];
             _previousBuffer = new Pixel[_width, _height];
-            
+
             Console.CursorVisible = false;
             ClearBuffer(_currentBuffer);
             ClearBuffer(_previousBuffer);
@@ -33,12 +34,12 @@ namespace activity_00_tap_26_27.Presentation
             {
                 for (int x = 0; x < _width; x++)
                 {
-                    buffer[x, y] = new Pixel { Character = ' ', Color = ConsoleColor.Gray };
+                    buffer[x, y] = new Pixel { _character = ' ', _color = ConsoleColor.Gray };
                 }
             }
         }
 
-        public void Draw(int x, int y, string text, ConsoleColor color)
+        public void Draw(int x, int y, string text, ConsoleColor color, ConsoleColor background_color)
         {
             if (x < 0 || x >= _width || y < 0 || y >= _height)
             {
@@ -49,7 +50,7 @@ namespace activity_00_tap_26_27.Presentation
             {
                 if (x + character_index < _width)
                 {
-                    _currentBuffer[x + character_index, y] = new Pixel { Character = text[character_index], Color = color };
+                    _currentBuffer[x + character_index, y] = new Pixel { _character = text[character_index], _color = color, _backgroundColor = background_color };
                 }
             }
         }
@@ -64,11 +65,12 @@ namespace activity_00_tap_26_27.Presentation
                     Pixel current = _currentBuffer[x, y];
                     Pixel previous = _previousBuffer[x, y];
 
-                    if (current.Character != previous.Character || current.Color != previous.Color)
+                    if (current._character != previous._character || current._color != previous._color || current._backgroundColor != previous._backgroundColor)
                     {
                         Console.SetCursorPosition(x, y);
-                        Console.ForegroundColor = current.Color;
-                        Console.Write(current.Character);
+                        Console.ForegroundColor = current._color;
+                        Console.BackgroundColor = current._backgroundColor;
+                        Console.Write(current._character);
                         _previousBuffer[x, y] = current;
                     }
                 }
@@ -76,8 +78,9 @@ namespace activity_00_tap_26_27.Presentation
 
             // Reset current buffer for next frame
             ClearBuffer(_currentBuffer);
-            
+
             Console.ResetColor();
         }
+
     }
 }

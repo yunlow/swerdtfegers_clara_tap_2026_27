@@ -14,6 +14,9 @@ namespace activity_00_tap_26_27.Core
 
         private bool _shouldQuit = false;
 
+        private GameObject _currentLocation;
+        private int _selectedDestinationIndex = -1;
+
         public GameManager(EventManager event_manager)
         {
             _eventManager = event_manager;
