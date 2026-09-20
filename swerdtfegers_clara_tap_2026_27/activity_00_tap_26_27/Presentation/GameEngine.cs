@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System;
 using activity_00_tap_26_27.Components;
+using activity_00_tap_26_27.Events;
 
 namespace activity_00_tap_26_27
 {
@@ -9,12 +10,16 @@ namespace activity_00_tap_26_27
     {
         private const float FIXED_FRAME_TIME = 20 / 1000.0f;
 
-
+        private EventManager _eventManager;
+        private LogManager _logManager;
+        private GameManager _gameManager;
+       
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
-        private readonly List<GameObject> _gameObjectTable = new List<GameObject>();
+       
 
         private readonly ConsoleRenderManager _renderManager = new ConsoleRenderManager();
+
 
         private bool _shouldQuit = false;
 
@@ -31,6 +36,8 @@ namespace activity_00_tap_26_27
                 float loop_start_time = GetCurrentTime();
                 float elapsed_time = loop_start_time - last_time;
 
+                lag += elapsed_time;
+
                 ProcessInput();
 
                 while(lag >= FIXED_FRAME_TIME)
@@ -39,15 +46,23 @@ namespace activity_00_tap_26_27
                     lag -= FIXED_FRAME_TIME;
                 }
 
+                _eventManager.ProcessEvents();
+                _eventManager.TriggerDelayedEvents(elapsed_time);
 
                 Update(elapsed_time);
 
                 Render();
+                
+                _gameManager.Update(elapsed_time);
+                _gameManager.FixedUpdate(FIXED_FRAME_TIME);
 
                 last_time = loop_start_time;
+
+                _gameManager.GetShouldQuit();
             }
 
-            Console.WriteLine("Goodbye!");
+            _logManager.Log("GameEngine.Run() - Game loop has exited.");
+
         }
 
         private void ProcessInput()
@@ -55,6 +70,8 @@ namespace activity_00_tap_26_27
             while (Console.KeyAvailable)
             {
                 ConsoleKeyInfo player_command = Console.ReadKey(true);
+
+                
 
                 if (player_command.Key == ConsoleKey.Escape)
                 {
@@ -65,28 +82,12 @@ namespace activity_00_tap_26_27
 
         private void FixedUpdate(float fixed_elapsed_time)
         {
-            for (int object_index = 0; object_index < _gameObjectTable.Count; object_index++)
-            {
-                GameObject game_object = _gameObjectTable[object_index];
 
-                if (game_object.GetIsActive())
-                {
-                    game_object.FixedUpdate(fixed_elapsed_time);
-                }
-            }
         }
 
         private void Update(float elapsed_time)
         {
-            for (int object_index = 0; object_index < _gameObjectTable.Count; object_index++)
-            {
-                GameObject game_object = _gameObjectTable[object_index];
-
-                if (game_object.GetIsActive())
-                {
-                    game_object.Update(elapsed_time);
-                }
-            }
+           
         }
 
         private void Render()

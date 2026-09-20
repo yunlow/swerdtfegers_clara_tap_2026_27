@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace activity_00_tap_26_27.Events
+namespace activity_00_tap_26_27.Core.Events
 {
     public class LogManager
     {

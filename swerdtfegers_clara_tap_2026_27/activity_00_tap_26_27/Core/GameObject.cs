@@ -12,6 +12,8 @@ namespace activity_00_tap_26_27
         public GameObject(string name)
         {
             _name = name;
+
+            
         }
 
         public string GetName()

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace activity_00_tap_26_27
+namespace activity_00_tap_26_27.Presentation
 {
     public class ConsoleRenderManager
     {

@@ -8,4 +8,9 @@
         <LangVersion>9</LangVersion>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Core\" />
+      <Folder Include="Presentation\" />
+    </ItemGroup>
+
 </Project>

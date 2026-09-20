@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace activity_00_tap_26_27.Events
+namespace activity_00_tap_26_27.Core.Events
 {
     public class LogMessageGameEvent : IGameEvent
     {
