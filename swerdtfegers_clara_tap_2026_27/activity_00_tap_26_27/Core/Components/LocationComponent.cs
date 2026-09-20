@@ -9,7 +9,7 @@ namespace activity_00_tap_26_27.Core.Components
     public class LocationComponent : Component
     {
         private readonly string _locationName;
-        private readonly List<LocationLink> _links = new List<LocationLink>();
+        private readonly List<Connection> _links = new List<Connection>();
 
         public LocationComponent(GameObject owner, string location_name)
         {
@@ -21,9 +21,9 @@ namespace activity_00_tap_26_27.Core.Components
             return _locationName;
         }
 
-        public void AddLink(GameObject destination, float duration)
+        public void AddConnection(GameObject destination, float duration)
         {
-            _links.Add(new LocationLink(destination, duration));
+            _links.Add(new Connection(destination, duration));
         }
 
         public int GetDestinationCount()
@@ -31,7 +31,7 @@ namespace activity_00_tap_26_27.Core.Components
             return _links.Count;
         }
 
-        public LocationLink GetDestinationAtIndex(int index)
+        public Connection GetDestinationAtIndex(int index)
         {
             if (index >= 0 && index < _links.Count)
             {

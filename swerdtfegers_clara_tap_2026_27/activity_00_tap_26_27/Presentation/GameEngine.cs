@@ -116,7 +116,7 @@ namespace activity_00_tap_26_27.Presentation
 
         private void Render()
         {
-            _renderManager.Draw(0,0, "Game in progress...\n", ConsoleColor.Magenta);
+            _renderManager.Draw(0,0, "Game in progress...\n", ConsoleColor.Magenta, ConsoleColor.Black);
             _renderManager.Render();
         }
 
