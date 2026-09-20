@@ -1,4 +1,4 @@
-﻿using activity_00_tap_26_27.Events;
+﻿using activity_00_tap_26_27.Core.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,19 +14,35 @@ namespace activity_00_tap_26_27.Core
 
         private bool _shouldQuit = false;
 
-        public GameManager()
+        public GameManager(EventManager event_manager)
         {
+            _eventManager = event_manager;
+            _eventManager.RegisterToEvent<RegisterGameObjectGameEvent>(OnRegisterGameObject);
+            _eventManager.RegisterToEvent<UnregisterGameObjectGameEvent>(OnUnregisterGameObject);
             _eventManager.RegisterToEvent<GameActionGameEvent>(OnGameAction);
         }
 
-        private void SendTranslatedKey(ConsoleKey console_key, EventManager event_manager)
+        private void OnRegisterGameObject(IGameEvent game_event)
         {
-            switch (console_key)
+            if (game_event is RegisterGameObjectGameEvent register_event)
             {
-                case ConsoleKey.UpArrow:
-                    {
-                        event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.NAVIGATE_UP));
-                    }
+                GameObject game_object = register_event.GetGameObject();
+                if (game_object != null && !_gameObjectTable.Contains(game_object))
+                {
+                    _gameObjectTable.Add(game_object);
+                }
+            }
+        }
+
+        private void OnUnregisterGameObject(IGameEvent game_event)
+        {
+            if (game_event is UnregisterGameObjectGameEvent unregister_event)
+            {
+                GameObject game_object = unregister_event.GetGameObject();
+                if (game_object != null)
+                {
+                    _gameObjectTable.Remove(game_object);
+                }
             }
         }
 
