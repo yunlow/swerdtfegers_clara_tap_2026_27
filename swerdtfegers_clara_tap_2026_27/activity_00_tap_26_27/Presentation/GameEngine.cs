@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using activity_00_tap_26_27.Components;
+using activity_00_tap_26_27.Core;
+using activity_00_tap_26_27.Core.Events;
 using System;
-using activity_00_tap_26_27.Components;
-using activity_00_tap_26_27.Events;
+using System.Collections.Generic;
+using System.Diagnostics;
+using static System.Collections.Specialized.BitVector32;
 
-namespace activity_00_tap_26_27
+namespace activity_00_tap_26_27.Presentation
 {
     public class GameEngine
     {
@@ -21,7 +23,7 @@ namespace activity_00_tap_26_27
         private readonly ConsoleRenderManager _renderManager = new ConsoleRenderManager();
 
 
-        private bool _shouldQuit = false;
+     
 
         public void Run()
         {
@@ -31,7 +33,7 @@ namespace activity_00_tap_26_27
 
             float last_time = GetCurrentTime();
 
-            while (!_shouldQuit)
+            while (!_gameManager.GetShouldQuit())
             {
                 float loop_start_time = GetCurrentTime();
                 float elapsed_time = loop_start_time - last_time;
@@ -47,7 +49,7 @@ namespace activity_00_tap_26_27
                 }
 
                 _eventManager.ProcessEvents();
-                _eventManager.TriggerDelayedEvents(elapsed_time);
+                
 
                 Update(elapsed_time);
 
@@ -71,11 +73,23 @@ namespace activity_00_tap_26_27
             {
                 ConsoleKeyInfo player_command = Console.ReadKey(true);
 
-                
+                GameActionType action = GameActionType.QUIT;
 
-                if (player_command.Key == ConsoleKey.Escape)
+                if (ConsoleKey.UpArrow == player_command.Key)
                 {
-                    _shouldQuit = true;
+                    action = GameActionType.NAVIGATE_UP;
+                }
+                else if (ConsoleKey.DownArrow == player_command.Key)
+                {
+                    action = GameActionType.NAVIGATE_DOWN;
+                }
+                else if (ConsoleKey.Enter == player_command.Key)
+                {
+                    action = GameActionType.CONFIRM;
+                }
+                else if (ConsoleKey.Escape == player_command.Key)
+                {
+                    action = GameActionType.CANCEL;
                 }
             }
         }
