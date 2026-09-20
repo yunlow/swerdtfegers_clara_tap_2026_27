@@ -1,4 +1,4 @@
-﻿using activity_00_tap_26_27.Components;
+﻿
 using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
 using System;
@@ -99,7 +99,7 @@ namespace activity_00_tap_26_27.Presentation
 
                 if(is_valid_command)
                 {
-                    _eventManager.TriggerEvent(new GameActionGameEvent());
+                    _eventManager.TriggerEvent(new GameActionGameEvent(action));
                 }
             }
         }
