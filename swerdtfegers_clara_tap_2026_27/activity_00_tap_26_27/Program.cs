@@ -7,6 +7,8 @@ namespace activity_00_tap_26_27
         static void Main(string[] args)
         {
             new GameEngine().Run();
+
+            // temps passé hors classe: environ 4h
         }
     }
 }
