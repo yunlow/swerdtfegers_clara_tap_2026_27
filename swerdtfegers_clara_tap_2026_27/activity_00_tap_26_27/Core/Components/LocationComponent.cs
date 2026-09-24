@@ -8,36 +8,36 @@ namespace activity_00_tap_26_27.Core.Components
 {
     public class LocationComponent : Component
     {
-        private readonly string _locationName;
-        private readonly List<Connection> _links = new List<Connection>();
+        private string _locationName;
+        private readonly List<Connection> _connectionTable = new List<Connection>();
 
-        public LocationComponent(GameObject owner, string location_name)
+
+
+        public LocationComponent(string location_name)
         {
             _locationName = location_name;
         }
 
-        public string GetLocationName()
+        public void AddConnection(LocationComponent location_component, float travel_duration)
+        {
+            _connectionTable.Add(new Connection(location_component, travel_duration));
+        }
+
+        public string GetName()
         {
             return _locationName;
         }
 
-        public void AddConnection(GameObject destination, float duration)
-        {
-            _links.Add(new Connection(destination, duration));
-        }
-
         public int GetDestinationCount()
         {
-            return _links.Count;
+            return _connectionTable.Count;
         }
 
-        public Connection GetDestinationAtIndex(int index)
+        public Connection GetDestinationAtIndex(int location_index)
         {
-            if (index >= 0 && index < _links.Count)
-            {
-                return _links[index];
-            }
-            return null;
+            return _connectionTable[location_index];
         }
+
+      
     }
 }

@@ -8,16 +8,11 @@ namespace activity_00_tap_26_27.Core.Events
 {
     public class GameActionGameEvent : IGameEvent
     {
-        private readonly GameActionType _actionType;
+        public readonly GameActionType _gameActionType;
 
-        public GameActionGameEvent(GameActionType action_type)
+        public GameActionGameEvent(GameActionType game_action_type)
         {
-            _actionType = action_type;
-        }
-
-        public GameActionType GetActionType()
-        {
-            return _actionType;
+            _gameActionType = game_action_type;
         }
     }
 }

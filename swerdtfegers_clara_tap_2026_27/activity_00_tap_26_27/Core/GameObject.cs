@@ -12,8 +12,6 @@ namespace activity_00_tap_26_27.Core
         public GameObject(string name)
         {
             _name = name;
-
-            
         }
 
         public string GetName()
@@ -90,6 +88,7 @@ namespace activity_00_tap_26_27.Core
                 }
             }
         }
-        
+
+
     }
 }

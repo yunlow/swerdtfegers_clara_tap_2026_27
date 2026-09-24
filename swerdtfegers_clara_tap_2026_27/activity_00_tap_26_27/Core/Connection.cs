@@ -1,4 +1,5 @@
-﻿using System;
+﻿using activity_00_tap_26_27.Core.Components;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,23 +9,23 @@ namespace activity_00_tap_26_27.Core
 {
     public class Connection
     {
-        private readonly GameObject _destination;
-        private readonly float _duration;
+        private LocationComponent _destinationLocation;
+        private float _timeToReachDestination;
 
-        public Connection(GameObject destination, float duration)
+        public Connection(LocationComponent destination_location, float time_to_reach_destination)
         {
-            _destination = destination;
-            _duration = duration;
+            _destinationLocation = destination_location;
+            _timeToReachDestination = time_to_reach_destination;
         }
 
-        public GameObject GetDestination()
+        public LocationComponent GetDestinationLocation()
         {
-            return _destination;
+            return _destinationLocation;
         }
 
-        public float GetDuration()
+        public float GetTimeToReachDestination()
         {
-            return _duration;
+            return _timeToReachDestination;
         }
     }
 }

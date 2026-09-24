@@ -48,8 +48,9 @@ namespace activity_00_tap_26_27.Presentation
                     lag -= FIXED_FRAME_TIME;
                 }
 
-                _eventManager.ProcessEvents();
+          
                 
+               
 
                 Update(elapsed_time);
 
@@ -57,6 +58,8 @@ namespace activity_00_tap_26_27.Presentation
                 
                 _gameManager.Update(elapsed_time);
                 _gameManager.FixedUpdate(FIXED_FRAME_TIME);
+
+                _eventManager.ProcessDelayedEvents();
 
                 last_time = loop_start_time;
 

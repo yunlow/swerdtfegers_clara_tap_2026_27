@@ -7,6 +7,7 @@ namespace activity_00_tap_26_27.Core.Events
     {
         private readonly Dictionary<Type, List<Action<IGameEvent>>> _eventTypeTable = new Dictionary<Type, List<Action<IGameEvent>>>();
         private Queue<IGameEvent> _eventQueue = new Queue<IGameEvent>();
+       
 
         public void RegisterToEvent<TYPE>(Action<IGameEvent> action) where TYPE : IGameEvent
         {
@@ -30,6 +31,8 @@ namespace activity_00_tap_26_27.Core.Events
             }
         }
 
+
+
         public void TriggerDelayedEvent(IGameEvent game_event)
         {
             _eventQueue.Enqueue(game_event);
@@ -49,7 +52,7 @@ namespace activity_00_tap_26_27.Core.Events
             }
         }
 
-        public void ProcessEvents()
+        public void ProcessDelayedEvents()
         {
             while (_eventQueue.Count > 0)
             {
@@ -63,5 +66,7 @@ namespace activity_00_tap_26_27.Core.Events
                 }
             }
         }
-      }
+
+       
+    }
 }
