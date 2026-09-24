@@ -1,4 +1,6 @@
-﻿namespace GameLibraryTests
+﻿using GameLibrary;
+
+namespace GameLibraryTests
 {
     public class Tests
     {
