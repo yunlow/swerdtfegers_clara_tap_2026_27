@@ -7,6 +7,10 @@ namespace GameLibraryTests;
 
 public class ConnectionTests
 {
+    private LocationComponent CreateLocation(string name)
+    {
+        return new LocationComponent(name);
+    }
     [SetUp]
     public void Setup()
     {
