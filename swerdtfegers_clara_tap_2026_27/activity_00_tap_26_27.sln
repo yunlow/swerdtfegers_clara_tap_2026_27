@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12120.281
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "activity_00_tap_26_27", "ConsoleApp\activity_00_tap_26_27.csproj", "{0246C6CA-D218-692B-01C6-C0B599803BFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLibrary", "GameLibrary\GameLibrary.csproj", "{46BD33CD-B7BC-2E1C-47DD-BF3EDD3DEDC5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0246C6CA-D218-692B-01C6-C0B599803BFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0246C6CA-D218-692B-01C6-C0B599803BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0246C6CA-D218-692B-01C6-C0B599803BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0246C6CA-D218-692B-01C6-C0B599803BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46BD33CD-B7BC-2E1C-47DD-BF3EDD3DEDC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46BD33CD-B7BC-2E1C-47DD-BF3EDD3DEDC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46BD33CD-B7BC-2E1C-47DD-BF3EDD3DEDC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46BD33CD-B7BC-2E1C-47DD-BF3EDD3DEDC5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CFDFEF03-51F5-4D66-9C95-AA8004DEFB9C}
+	EndGlobalSection
+EndGlobal

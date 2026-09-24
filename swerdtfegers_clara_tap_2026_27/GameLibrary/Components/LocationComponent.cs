@@ -1,10 +1,11 @@
-﻿using System;
+﻿using activity_00_tap_26_27.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace activity_00_tap_26_27.Core.Components
+namespace GameLibrary.Components
 {
     public class LocationComponent : Component
     {

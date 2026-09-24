@@ -1,4 +1,4 @@
-﻿using activity_00_tap_26_27.Core.Components;
+﻿using GameLibrary.Components;
 using System.Collections.Generic;
 
 namespace activity_00_tap_26_27.Core

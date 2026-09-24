@@ -1,9 +1,8 @@
 ﻿using activity_00_tap_26_27.Core;
-using activity_00_tap_26_27.Core.Components;
 using activity_00_tap_26_27.Core.Events;
-using activity_00_tap_26_27.Core.Components;
 using activity_00_tap_26_27.Core.Events;
 using System.Collections.Generic;
+using GameLibrary.Components;
 
 namespace activity_00_tap_26_27.Core
 {
