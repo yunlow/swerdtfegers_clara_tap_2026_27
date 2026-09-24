@@ -24,6 +24,11 @@ namespace GameLibrary.Components
             _connectionTable.Add(new Connection(location_component, travel_duration));
         }
 
+        public void CreateLocation(string location_name)
+        {
+            _locationName = location_name;
+        }
+
         public string GetName()
         {
             return _locationName;
