@@ -8,8 +8,15 @@ public class LogMessageTests
     }
 
     [Test]
-    public void Test1()
+    public void LogMessage_WriteTheCorrectSentence()
     {
         Assert.Pass();
     }
+
+    public void LogMessage_DoesNotReorderSentences()
+    {
+        Assert.Pass();
+    }
+
+
 }

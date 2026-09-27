@@ -24,4 +24,5 @@ public class ConnectionTests
         Assert.That(connection.GetDestinationLocation(), Is.EqualTo(destination));
         Assert.That(connection.GetTimeToReachDestination(), Is.EqualTo(3.0f).Within(0.001f));
     }
+
 }
