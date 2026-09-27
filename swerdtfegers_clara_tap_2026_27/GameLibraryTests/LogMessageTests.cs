@@ -1,4 +1,7 @@
-﻿namespace GameLibraryTests;
+﻿using activity_00_tap_26_27.Core.Events;
+using GameLibrary.Interfaces;
+
+namespace GameLibraryTests;
 
 public class LogMessageTests
 {
@@ -8,7 +11,7 @@ public class LogMessageTests
     }
 
     [Test]
-    public void LogMessage_WriteTheCorrectSentence()
+    public void LogMessage_WritesTheCorrectSentence()
     {
         Assert.Pass();
     }
@@ -18,5 +21,9 @@ public class LogMessageTests
         Assert.Pass();
     }
 
+    public void LogMessageGameEvent_WritesOneLineThatEndsWithSentMessage()
+    {
+        Assert.Pass();
+    }
 
 }
