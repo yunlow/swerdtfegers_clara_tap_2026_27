@@ -91,6 +91,8 @@ namespace activity_00_tap_26_27.Core
             }
         }
 
+       
+
         public int GetSelectedDestinationIndex()
         {
             return _selectedChildLocationIndex;
@@ -139,6 +141,11 @@ namespace activity_00_tap_26_27.Core
         public LocationComponent GetCurrentLocation()
         {
             return _currentLocation;
+        }
+
+        public void SetCurrentLocation(LocationComponent location_component)
+        {
+            _currentLocation = location_component;
         }
 
         public bool GetShouldQuit()
