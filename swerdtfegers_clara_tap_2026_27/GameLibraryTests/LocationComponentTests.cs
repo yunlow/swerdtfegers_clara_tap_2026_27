@@ -24,6 +24,7 @@ public class LocationComponentTests
 
         Assert.That(location_a.GetDestinationAtIndex(0).Equals(location_b));
     }
+
     [Test]
     public void Linking_LinkGoesBothWays_BKnowsA()
     {

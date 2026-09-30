@@ -1,12 +1,33 @@
-﻿namespace GameLibrary.States
+﻿using activity_00_tap_26_27.Core.Events;
+
+namespace GameLibrary.States
 {
     public class StateMachine
     {
         private IState _currentState;
+        private EventManager _eventManager;
+
+        public StateMachine(EventManager event_manager)
+        {
+            
+            _eventManager = event_manager;
+
+            _eventManager.RegisterToEvent<LogMessageGameEvent>(OnLogMessageGameEvent);
+
+        }
+
+        private void OnLogMessageGameEvent(IGameEvent game_event)
+        {
+            if (_currentState != null)
+            {
+                _eventManager.TriggerEvent(new LogMessageGameEvent($"Current State: {_currentState.GetType().Name}"));
+            }
+        }
 
         public void SetInitialState(IState initial_state)
         {
             _currentState = initial_state;
+           _eventManager.TriggerEvent(new LogMessageGameEvent($"Initial State: {_currentState.GetType().Name}"));
             _currentState.Enter();
         }
 
