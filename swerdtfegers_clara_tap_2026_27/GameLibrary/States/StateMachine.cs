@@ -26,7 +26,7 @@ namespace GameLibrary.States
 
         public void ChangeState(IState new_state)
         {
-            _event_manager.TriggerEvent(new LogMessageGameEvent($"{_currentState.GetType().Name} changed state to {new_state.GetType().Name}"));
+            _eventManager.TriggerEvent(new LogMessageGameEvent($"{_currentState.GetType().Name} changed state to {new_state.GetType().Name}"));
             _currentState.Exit();
             _currentState = new_state;
             _currentState.Enter();
