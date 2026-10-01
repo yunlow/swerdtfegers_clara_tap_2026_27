@@ -16,7 +16,11 @@ namespace GameLibrary.States
 
         }
 
-       
+       public StateMachine GetState()
+        {
+            _eventManager.TriggerEvent(new LogMessageGameEvent($"Current State: {_currentState.GetType().Name}"));
+            return _currentState as StateMachine;
+        }
         public void SetInitialState(IState initial_state)
         {
             _currentState = initial_state;

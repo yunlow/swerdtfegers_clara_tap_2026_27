@@ -5,7 +5,10 @@ using System.Diagnostics;
 using static System.Collections.Specialized.BitVector32;
 using activity_00_tap_26_27.Core.Events;
 
+
 using GameLibrary;
+using activity_00_tap_26_27.Render;
+using GameLibrary.States;
 
 namespace activity_00_tap_26_27
 {
@@ -20,11 +23,16 @@ namespace activity_00_tap_26_27
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
        
+        private Dictionary<Type, IScreenRenderer> _screenRenderers = new Dictionary<Type, IScreenRenderer>();
 
         private readonly ConsoleRenderManager _renderManager = new ConsoleRenderManager();
 
 
-     
+     public GameEngine()
+        {
+            _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
+            _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
+        }
 
         public void Run()
         {

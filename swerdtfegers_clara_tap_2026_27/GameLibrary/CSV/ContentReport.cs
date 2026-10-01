@@ -10,5 +10,14 @@ namespace GameLibrary.CSV
         {
             throw new NotImplementedException();
         }
+        public int GetErrorCount()
+        {
+            throw new NotImplementedException();
+        }
+        public void GetErrorTextAtIndex(int error_index)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
