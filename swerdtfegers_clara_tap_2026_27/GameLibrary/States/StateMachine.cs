@@ -12,18 +12,11 @@ namespace GameLibrary.States
             
             _eventManager = event_manager;
 
-            _eventManager.RegisterToEvent<LogMessageGameEvent>(OnLogMessageGameEvent);
+            
 
         }
 
-        private void OnLogMessageGameEvent(IGameEvent game_event)
-        {
-            if (_currentState != null)
-            {
-                _eventManager.TriggerEvent(new LogMessageGameEvent($"Current State: {_currentState.GetType().Name}"));
-            }
-        }
-
+       
         public void SetInitialState(IState initial_state)
         {
             _currentState = initial_state;
@@ -33,6 +26,7 @@ namespace GameLibrary.States
 
         public void ChangeState(IState new_state)
         {
+            _event_manager.TriggerEvent(new LogMessageGameEvent($"{_currentState.GetType().Name} changed state to {new_state.GetType().Name}"));
             _currentState.Exit();
             _currentState = new_state;
             _currentState.Enter();

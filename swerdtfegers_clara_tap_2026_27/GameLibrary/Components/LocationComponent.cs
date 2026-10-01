@@ -11,7 +11,7 @@ namespace GameLibrary.Components
     {
         private string _locationName;
         private readonly List<Connection> _connectionTable = new List<Connection>();
-
+        private LocationComponent _parentLocation;
 
 
         public LocationComponent(string location_name)
@@ -22,9 +22,18 @@ namespace GameLibrary.Components
         public void AddConnection(LocationComponent location_component, float travel_duration)
         {
             _connectionTable.Add(new Connection(location_component, travel_duration));
+            location_component.SetParentLocation(this);
         }
 
-       
+        private void SetParentLocation(LocationComponent parent_location)
+        {
+            _parentLocation = parent_location;
+        }
+
+        public LocationComponent GetParentLocation()
+        {
+            return _parentLocation;
+        }
 
         public string GetName()
         {

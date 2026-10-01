@@ -12,26 +12,29 @@ namespace GameLibrary.States
         private readonly GameManager _gameManager;
         private readonly EventManager _eventManager;
         private bool _shouldQuit;
-        private readonly IState _iState;
+        private StateMachine _stateMachine;
+        
 
         private LocationComponent _currentLocation;
         private int _selectedChildLocationIndex = -1;
 
         private readonly List<GameObject> _gameObjectTable = new List<GameObject>();
 
-        public MainMenuState(GameManager gameManager, EventManager eventManager, IState i_state)
+        public MainMenuState(GameManager gameManager, EventManager eventManager, StateMachine state_machine)
         {
             _gameManager = gameManager;
             _eventManager = eventManager;
-            _iState = i_state;
+            _stateMachine = state_machine;
         }
         public void Enter()
         {
             _eventManager.RegisterToEvent<GameActionGameEvent>(OnGameAction);
+            _gameManager.SetIsMenuStateActive(true);
         }
 
         public void Exit()
         {
+            _gameManager.SetIsMenuStateActive(false);
             _eventManager.UnregisterFromEvent<GameActionGameEvent>(OnGameAction);
         }
 
@@ -120,29 +123,14 @@ namespace GameLibrary.States
         {
             GameActionGameEvent game_action_game_event = game_event as GameActionGameEvent;
 
-            _eventManager.TriggerEvent(new LogMessageGameEvent($"Command {game_action_game_event._gameActionType} received!"));
-
-            if (game_action_game_event._gameActionType == GameActionType.NAVIGATE_DOWN)
+            if (game_action_game_event._gameActionType == GameActionType.CONFIRM)
             {
-                _selectedChildLocationIndex = (_selectedChildLocationIndex + 1) % _currentLocation.GetDestinationCount();
-            }
-            else if (game_action_game_event._gameActionType == GameActionType.NAVIGATE_UP)
-            {
-                _selectedChildLocationIndex = (_selectedChildLocationIndex - 1 + _currentLocation.GetDestinationCount()) % _currentLocation.GetDestinationCount();
-            }
-            else if (game_action_game_event._gameActionType == GameActionType.CONFIRM)
-            {
-                Connection selected_connection = _currentLocation.GetDestinationAtIndex(_selectedChildLocationIndex);
-                _eventManager.TriggerEvent(new LogMessageGameEvent($"Location changed from {_currentLocation.GetName()} to {selected_connection.GetDestinationLocation().GetName()} - time taken: {selected_connection.GetTimeToReachDestination()}."));
-                _currentLocation = selected_connection.GetDestinationLocation();
-            }
-            else if (game_action_game_event._gameActionType == GameActionType.CANCEL)
-            {
-                _selectedChildLocationIndex = -1;
+                
+                _stateMachine.ChangeState(new ExploringState(_stateMachine, _gameManager, _eventManager));
             }
             else if (game_action_game_event._gameActionType == GameActionType.QUIT)
             {
-                _shouldQuit = true;
+                _gameManager.RequestQuit();
             }
         }
 
