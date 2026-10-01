@@ -32,6 +32,8 @@ namespace activity_00_tap_26_27
         {
             _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
             _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
+
+            
         }
 
         public void Run()
@@ -129,7 +131,11 @@ namespace activity_00_tap_26_27
         private void Render()
         {
             _renderManager.Draw(0,0, "Game in progress...\n", ConsoleColor.Magenta, ConsoleColor.Black);
-            _renderManager.Render();
+            _renderManager.Render(); //obligatoire de le mettre car donne la base avant d'être changé par le reste
+
+            IScreenRenderer current_renderer = _screenRenderers[_gameManager.GetCurrentGameFlowState().GetType()];
+            
+            current_renderer.Render(_gameManager.GetCurrentGameFlowState(), _renderManager);
         }
 
         private float GetCurrentTime()

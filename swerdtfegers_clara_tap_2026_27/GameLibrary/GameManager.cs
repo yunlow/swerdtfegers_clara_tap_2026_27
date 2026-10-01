@@ -142,9 +142,9 @@ namespace activity_00_tap_26_27.Core
         {
             return _shouldQuit;
         }
-        public StateMachine GetCurrentGameFlowState()
+        public IState GetCurrentGameFlowState()
         {
-            return _gameFlowStateStateMachine.GetState();
+            return _gameFlowStateStateMachine as IState;
         }
     }
 }
