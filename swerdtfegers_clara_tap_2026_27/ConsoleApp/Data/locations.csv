@@ -1,0 +1,8 @@
+Id;Name;ParentId;TravelMinutes
+WORLD;World;;
+DAISY_TOWN;Daisy Town;WORLD;180
+LAUGHING_HORSE_INN;Laughing Horse Inn;DAISY_TOWN;5
+GUN_SHOP;Gun Shop;DAISY_TOWN;5
+SILVER_MINE;Silver Mine Dungeon;WORLD;240
+MINE_LEVEL_1;Dungeon Level 1;SILVER_MINE;15
+MINE_LEVEL_2;Dungeon Level 2;MINE_LEVEL_1;20

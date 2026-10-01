@@ -1,9 +1,11 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
 using activity_00_tap_26_27.Core.Events;
-using System.Collections.Generic;
 using GameLibrary.Components;
 using GameLibrary.States;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace activity_00_tap_26_27.Core
 {
@@ -40,37 +42,27 @@ namespace activity_00_tap_26_27.Core
 
         public void StartExploration()
         {
-            _eventManager.TriggerEvent(new LogMessageGameEvent("Game manager started."));
-
-            LocationComponent world_location = CreateLocation("World", _eventManager, null, 0.0f);
-
-            _currentLocation = world_location;
-
-            LocationComponent town_location = CreateLocation("Daisy Town", _eventManager, world_location, 10.0f);
-            LocationComponent inn_location = CreateLocation("Laughing Horse Inn", _eventManager, town_location, 5.0f);
-            LocationComponent shop_location = CreateLocation("Gun Shop", _eventManager, town_location, 3.0f);
-
-            LocationComponent dungeon_location = CreateLocation("Silver Mine Dungeon", _eventManager, world_location, 15.0f);
-            LocationComponent dungeon_level_one_location = CreateLocation("Dungeon level 1", _eventManager, dungeon_location, 2.0f);
-            LocationComponent dungeon_level_two_location = CreateLocation("Dungeon level 2", _eventManager, dungeon_level_one_location, 5.0f);
-        }
-
-        private LocationComponent CreateLocation(string location_name, EventManager event_manager, LocationComponent parent_location, float distance_to_parent)
-        {
-            GameObject game_object = new GameObject(location_name);
-            LocationComponent location_component = new LocationComponent(location_name);
-
-            game_object.AddComponent(location_component);
-
-            if (parent_location != null)
+            string file_path = Path.GetFullPath("../../../Data/locations.csv");
+            if (!File.Exists(file_path))
             {
-                parent_location.AddConnection(location_component, distance_to_parent);
+                Console.WriteLine($"file locations.csv not found at {file_path}");
             }
+            else
+            {
+                try
+                {
+                    string content = File.ReadAllText(file_path);
+                }
+                catch (IOException)
+                {
+                    // Cas réel : le fichier est encore ouvert.
+                    Console.WriteLine($"locations.csv cannot be read. Close it in your spreadsheet and try again.");
+                }
 
-            event_manager.TriggerDelayedEvent(new RegisterGameObjectGameEvent(game_object));
-
-            return location_component;
+            }
         }
+
+      
 
         private void OnRegisterGameObjectGameEvent(IGameEvent game_event)
         {
