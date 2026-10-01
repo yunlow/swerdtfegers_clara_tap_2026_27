@@ -1,82 +1,55 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
+using GameLibrary;
 using GameLibrary.Components;
 
-namespace GameLibraryTests;
 
-public class GameManagerTests
+namespace GameLibraryTests
 {
-
-    private LocationComponent CreateLocation(string name)
+    public class GameManagerTests
     {
-        return new LocationComponent(name);
-    }
+        [Test]
+        public void GetSelectedDestinationIndex_ReturnMinusOneAfterConstruction()
+        {
+            EventManager event_manager = new EventManager();
+            GameManager game_manager = new GameManager(event_manager);
 
-    [SetUp]
-    public void Setup()
-    {
-    }
+            Assert.That(game_manager.GetSelectedDestinationIndex(), Is.EqualTo(-1));
+        }
 
-    [Test]
-    public void InitialState_HasNoSelectedDestination()
-    {
-        EventManager event_manager = new EventManager();
-        GameManager game_manager = new GameManager(event_manager);
+        [Test]
+        public void GetSelectedDestinationIndex_ReturnMinusOneAfterConfirmCommand()
+        {
+            EventManager event_manager = new EventManager();
+            GameManager game_manager = new GameManager(event_manager);
 
-        LocationComponent current_location = game_manager.GetCurrentLocation();
+            event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.CONFIRM));
 
-        Assert.That(current_location, Is.Null);
-    }
+            Assert.That(game_manager.GetSelectedDestinationIndex(), Is.EqualTo(-1));
+        }
 
-    [Test]
+        [Test]
+        public void GetSelectedDestinationIndex_ReturnZeroAfterNavigateDownCommand()
+        {
+            EventManager event_manager = new EventManager();
+            GameManager game_manager = new GameManager(event_manager);
 
-    public void ConfirmAction_WithoutSelection_DoesNotChangeLocation()
-    {
-        EventManager event_manager = new EventManager();
-        GameManager game_manager = new GameManager(event_manager);
-        GameActionType confirm_action = GameActionType.CONFIRM;
-        LocationComponent initial_location = CreateLocation("Initial Location");
+            event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.NAVIGATE_DOWN));
 
-        
-        game_manager.SetCurrentLocation(initial_location);
-        event_manager.TriggerEvent(new GameActionGameEvent(confirm_action));
+            Assert.That(game_manager.GetSelectedDestinationIndex(), Is.EqualTo(0));
+        }
 
-        LocationComponent current_location = game_manager.GetCurrentLocation();
-        Assert.That(current_location, Is.EqualTo(initial_location));
-    }
+        [Test]
+        public void GetCurrentLocation_ReturnChildAfterNavigateDownAndConfirmCommand()
+        {
+            EventManager event_manager = new EventManager();
+            GameManager game_manager = new GameManager(event_manager);
+            LocationComponent initial_location = game_manager.GetCurrentLocation();
 
-    [Test]
-    public void NavigateDownAction_WithoutSelection_SelectsFirstDestination()
-    {
-        EventManager event_manager = new EventManager();
-        GameManager game_manager = new GameManager(event_manager);
-        GameActionType navigate_down_action = GameActionType.NAVIGATE_DOWN;
-        LocationComponent initial_location = CreateLocation("Initial Location");
-        LocationComponent destination_location = CreateLocation("Destination Location");
+            event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.NAVIGATE_DOWN));
+            event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.CONFIRM));
 
-        initial_location.AddConnection(destination_location, 5.0f);
-        game_manager.SetCurrentLocation(initial_location);
-        event_manager.TriggerEvent(new GameActionGameEvent(navigate_down_action));
-        int selected_index = game_manager.GetSelectedDestinationIndex();
-
-        Assert.That(selected_index, Is.EqualTo(0));
-    }
-
-    [Test]
-    public void NavigateDownAction_WithSelection_SelectsFirstDestination()
-    {
-        EventManager event_manager = new EventManager();
-        GameManager game_manager = new GameManager(event_manager);
-        GameActionType navigate_down_action = GameActionType.NAVIGATE_DOWN;
-        LocationComponent initial_location = CreateLocation("Initial Location");
-        LocationComponent destination_location = CreateLocation("Destination Location");
-
-        initial_location.AddConnection(destination_location, 5.0f);
-        game_manager.SetCurrentLocation(initial_location);
-        event_manager.TriggerEvent(new GameActionGameEvent(navigate_down_action));
-        event_manager.TriggerEvent(new GameActionGameEvent(navigate_down_action));
-        int selected_index = game_manager.GetSelectedDestinationIndex();
-
-        Assert.That(selected_index, Is.EqualTo(0));
+            Assert.That(game_manager.GetCurrentLocation(), Is.Not.EqualTo(initial_location));
+        }
     }
 }

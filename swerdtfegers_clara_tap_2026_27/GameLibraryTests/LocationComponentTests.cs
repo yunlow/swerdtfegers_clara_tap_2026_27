@@ -1,38 +1,54 @@
-﻿using GameLibrary.Components;
+﻿using activity_00_tap_26_27.Core;
+using activity_00_tap_26_27.Core.Events;
+using GameLibrary.Components;
+using GameLibrary.Interfaces;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace GameLibraryTests;
 
 public class LocationComponentTests
 {
-    private LocationComponent CreateLocation(string name)
+    private class FakeLogWriter : ILogWriter
     {
-        return new LocationComponent(name);
-    }
-    [SetUp]
-    public void Setup()
-    {
-    }
+        public readonly List<string> _logMessageTable = new List<string>();
 
-    [Test]
-    public void Linking_LinkGoesBothWays_AKnowsB()
-    {
-        LocationComponent location_a = CreateLocation("Location A");
-        LocationComponent location_b = CreateLocation("Location B");
-
-        location_a.AddConnection(location_b, 5.0f);
-
-        Assert.That(location_a.GetDestinationAtIndex(0).Equals(location_b));
+        public void WriteLine(string line)
+        {
+            _logMessageTable.Add(line);
+        }
     }
 
     [Test]
-    public void Linking_LinkGoesBothWays_BKnowsA()
+    public void LogMessage_WriteTheCorrectSentence()
     {
-        LocationComponent location_a = CreateLocation("Location A");
-        LocationComponent location_b = CreateLocation("Location B");
+        //ARRANGE
+        EventManager event_manager = new EventManager();
+        FakeLogWriter fake_log_writer = new FakeLogWriter();
+        LogManager log_manager = new LogManager(event_manager, fake_log_writer);
 
-        location_b.AddConnection(location_a, 5.0f);
+        //ACT
+        event_manager.TriggerEvent(new LogMessageGameEvent("test message"));
 
-        Assert.That(location_b.GetDestinationAtIndex(0).Equals(location_a));
+        //ASSERT
+        Assert.That(fake_log_writer._logMessageTable.Count, Is.EqualTo(1));
+        Assert.That(fake_log_writer._logMessageTable[0], Does.EndWith("test message\n"));
+    }
+
+    [Test]
+    public void LogMessage_DoesNotReorderSentences()
+    {
+        //ARRANGE
+        EventManager event_manager = new EventManager();
+        FakeLogWriter fake_log_writer = new FakeLogWriter();
+        LogManager log_manager = new LogManager(event_manager, fake_log_writer);
+
+        //ACT
+        event_manager.TriggerEvent(new LogMessageGameEvent("first test message"));
+        event_manager.TriggerEvent(new LogMessageGameEvent("second test message"));
+
+        //ASSERT
+        Assert.That(fake_log_writer._logMessageTable.Count, Is.EqualTo(2));
+        Assert.That(fake_log_writer._logMessageTable[0], Does.EndWith("first test message\n"));
+        Assert.That(fake_log_writer._logMessageTable[1], Does.EndWith("second test message\n"));
     }
 }
