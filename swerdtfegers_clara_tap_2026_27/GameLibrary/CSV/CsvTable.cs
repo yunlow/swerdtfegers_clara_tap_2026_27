@@ -6,48 +6,75 @@ namespace GameLibrary.CSV
 {
     public class CsvTable
     {
-        private string file_name;
-        private string _header;
+        private string _fileName;
+        private string[] _header;
+        private List<CsvRow> _rows;
 
         public CsvTable(string file_name)
         {
-            this.file_name = file_name;
+            _fileName = file_name;
+            _rows = new List<CsvRow>();
         }
 
         public void AddRow(CsvRow csv_row)
         {
-            throw new NotImplementedException();
+            _rows.Add(csv_row);
         }
+        
 
         public int GetColumnCount()
         {
-            throw new NotImplementedException();
+            if (_header == null)
+            {
+                return 0;
+            }
+            return _header.Length;
         }
 
         public int GetColumnIndex(string column_name)
         {
-            throw new NotImplementedException();
+            if (_header == null)
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < _header.Length; i++)
+            {
+                if (_header[i] == column_name)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         public int GetRowCount()
         {
-            throw new NotImplementedException();
+            return _rows.Count;
         }
 
         public void GetRowAtIndex(int row_index, out CsvRow csvRow)
         {
-            throw new NotImplementedException();
+            csvRow = _rows[row_index];
         }
 
 
         public bool GetHasHeader()
         {
-            throw new NotImplementedException();
+            if(_header == null)
+            {
+                return false;
+            }
+            return true;
         }
 
         public void SetHeader(string[] cells)
         {
-            throw new NotImplementedException();
+            for(int i = 0; i < cells.Length; i++)
+            {
+                cells[i] = cells[i].Trim();
+            }
+            
         }
     }
 }
