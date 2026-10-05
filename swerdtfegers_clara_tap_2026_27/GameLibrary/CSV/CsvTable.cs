@@ -16,11 +16,20 @@ namespace GameLibrary.CSV
             _rows = new List<CsvRow>();
         }
 
+        public List<CsvRow> GetRowsList()
+        {
+            return _rows;
+        }
+
         public void AddRow(CsvRow csv_row)
         {
             _rows.Add(csv_row);
         }
         
+        public string GetFileName()
+        {
+            return _fileName;
+        }
 
         public int GetColumnCount()
         {
