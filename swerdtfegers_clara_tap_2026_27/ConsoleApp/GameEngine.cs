@@ -120,12 +120,12 @@ namespace activity_00_tap_26_27
 
         private void FixedUpdate(float fixed_elapsed_time)
         {
-
+            _gameManager.FixedUpdate(fixed_elapsed_time);
         }
 
         private void Update(float elapsed_time)
         {
-           
+            _gameManager.Update(elapsed_time);
         }
 
         private void Render()
