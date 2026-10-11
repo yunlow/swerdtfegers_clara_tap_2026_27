@@ -6,24 +6,30 @@ namespace GameLibrary.CSV
 {
     public class ContentReport
     {
-        private List<string> _errors;
+       
 
-        public ContentReport()
+        private class ErrorData
         {
-            _errors = new List<string>();
+            public string _fileName;
+            public int _fileLine;
+            public string _message;
         }
+
+        private readonly List<ErrorData> _errorTable = new List<ErrorData>();
 
         public void AddError(string file_name, int line_number, string v)
         {
-            _errors.Add($"Error in file '{file_name}' at line {line_number}: {v}");
+            _errorTable.Add(new ErrorData { _fileName = file_name, _fileLine = line_number, _message = v });
         }
         public int GetErrorCount()
         {
-            return _errors.Count;
+            return _errorTable.Count;
         }
         public string GetErrorTextAtIndex(int error_index)
         {
-            return _errors[error_index];
+            ErrorData error_data = _errorTable[error_index];
+
+            return $"{error_data._fileName}, line {error_data._fileLine}: {error_data._message}";
         }
 
     }

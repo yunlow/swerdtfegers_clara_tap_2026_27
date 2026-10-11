@@ -6,13 +6,28 @@ namespace GameLibrary.CSV
 {
     public class CsvRow
     {
-        private int _lineNumber;
-        private string[] _cells;
+        private readonly int _lineNumber;
+        private readonly string[] _cellTable;
 
-        public CsvRow(int line_number, string[] cells)
+        public CsvRow(int line_number, string[] cell_table)
         {
             _lineNumber = line_number;
-            _cells = cells;
+            _cellTable = cell_table;
+        }
+
+        public string GetCellAtIndex(int cell_index)
+        {
+            return _cellTable[cell_index].Trim();
+        }
+
+        public int GetLineNumber()
+        {
+            return _lineNumber;
+        }
+
+        public int GetCellCount()
+        {
+            return _cellTable.Length;
         }
     }
 }

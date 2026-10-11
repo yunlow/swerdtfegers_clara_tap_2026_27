@@ -6,84 +6,75 @@ namespace GameLibrary.CSV
 {
     public class CsvTable
     {
-        private string _fileName;
-        private string[] _header;
-        private List<CsvRow> _rows;
+        private readonly string _fileName;
+        private readonly List<CsvRow> _rowTable = new List<CsvRow>();
+
+        private List<string> _rowHeaderTable;
 
         public CsvTable(string file_name)
         {
             _fileName = file_name;
-            _rows = new List<CsvRow>();
         }
 
-        public List<CsvRow> GetRowsList()
+        public List<string> GetRowHeaderTable()
         {
-            return _rows;
+            return _rowHeaderTable;
         }
 
-        public void AddRow(CsvRow csv_row)
+        public void SetHeader(string[] row_header_table)
         {
-            _rows.Add(csv_row);
+            _rowHeaderTable = new List<string>(row_header_table);
         }
-        
+
+        public void AddRow(CsvRow row)
+        {
+            _rowTable.Add(row);
+        }
+
+        public int GetRowCount()
+        {
+            return _rowTable.Count;
+        }
+
+        public CsvRow GetRowAtIndex(int row_index)
+        {
+            return _rowTable[row_index];
+        }
+
         public string GetFileName()
         {
             return _fileName;
         }
 
+        public bool GetHasHeader()
+        {
+            return _rowHeaderTable != null;
+        }
+
         public int GetColumnCount()
         {
-            if (_header == null)
-            {
-                return 0;
-            }
-            return _header.Length;
+            return _rowHeaderTable.Count;
         }
 
         public int GetColumnIndex(string column_name)
         {
-            if (_header == null)
-            {
-                return -1;
-            }
+            int column_index = -1;
 
-            for (int i = 0; i < _header.Length; i++)
+            for (int header_column_index = 0; header_column_index < _rowHeaderTable.Count; header_column_index++)
             {
-                if (_header[i] == column_name)
+                if (_rowHeaderTable[header_column_index].Contains(column_name))
                 {
-                    return i;
+                    column_index = header_column_index;
                 }
             }
-            return -1;
+
+            return column_index;
         }
 
-        public int GetRowCount()
+        public string GetColumnNameAtIndex(int column_index)
         {
-            return _rows.Count;
+            return _rowHeaderTable[column_index];
         }
 
-        public void GetRowAtIndex(int row_index, out CsvRow csvRow)
-        {
-            csvRow = _rows[row_index];
-        }
-
-
-        public bool GetHasHeader()
-        {
-            if(_header == null)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public void SetHeader(string[] cells)
-        {
-            for(int i = 0; i < cells.Length; i++)
-            {
-                cells[i] = cells[i].Trim();
-            }
-            
-        }
     }
 }

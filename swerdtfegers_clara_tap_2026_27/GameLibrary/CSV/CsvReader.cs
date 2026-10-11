@@ -6,34 +6,41 @@ namespace GameLibrary.CSV
 {
     public class CsvReader
     {
-        public CsvTable Read(string file_name, string content, ContentReport report)
-        {
-            CsvTable csv_table = new CsvTable(file_name);
-            string[] line_table = content.Split('\n');
-            for (int line_index = 0; line_index < line_table.Length; line_index++)
+        
+            public static CsvTable Read(string file_name, string content, ContentReport error_report)
             {
-                string line = line_table[line_index].Trim();
-                int line_number = line_index + 1;
-                if (line.Length > 0)
+                CsvTable result_table = new CsvTable(file_name);
+                string[] file_line_table = content.Split('\n');
+
+                for (int line_index = 0; line_index < file_line_table.Length; line_index++)
                 {
-                    string[] cells = line.Split(';');
-                    if (csv_table.GetHasHeader() == false)
+                    string file_line = file_line_table[line_index];
+
+                    if (!string.IsNullOrEmpty(file_line))
                     {
-                        csv_table.SetHeader(cells);
-                    }
-                    else if (cells.Length != csv_table.GetColumnCount())
-                    {
-                        report.AddError(file_name, line_number, $"{cells.Length} values found, " +
-                       $"{csv_table.GetColumnCount()} expected.");
-                    }
-                    else
-                    {
-                        csv_table.AddRow(new CsvRow(line_number, cells));
+                        string[] cell_table = file_line.Split(';');
+
+                        if (result_table.GetRowHeaderTable() == null)
+                        {
+                            result_table.SetHeader(cell_table);
+                        }
+                        else if (result_table.GetRowHeaderTable().Count < cell_table.Length)
+                        {
+                            error_report.AddError(file_name, line_index, "Too many column");
+                        }
+                        else if (result_table.GetRowHeaderTable().Count > cell_table.Length)
+                        {
+                            error_report.AddError(file_name, line_index, "Missing column");
+                        }
+                        else
+                        {
+                            result_table.AddRow(new CsvRow(line_index + 1, cell_table));
+                        }
                     }
                 }
-            }
-            return csv_table;
 
+                return result_table;
+            }
         }
     }
-}
+

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using activity_00_tap_26_27.Core.Events;
 using activity_00_tap_26_27;
+using activity_00_tap_26_27.Data;
 
 
 
@@ -12,47 +13,63 @@ namespace GameLibrary
 {
     public class WorldBuilder
     {
-        public static Dictionary<string, LocationComponent> Build(List<LocationData> location_datas)
+        private readonly List<LocationData> _locationDataTable;
+        private readonly List<ShopData> _shopDataTable;
+        private readonly List<ItemData> _itemDataTable;
+
+        public WorldBuilder(List<LocationData> location_data_table, List<ShopData> shop_data_table, List<ItemData> item_data_table)
         {
-            Dictionary<string, LocationComponent> location_table = new Dictionary<string, LocationComponent>();
+            _locationDataTable = location_data_table;
+            _shopDataTable = shop_data_table;
+            _itemDataTable = item_data_table;
+        }
 
-            
-            for (int i = 0; i < location_datas.Count; i++)
+        public LocationComponent Build(EventManager event_manager)
+        {
+            LocationComponent root_location = null;
+            Dictionary<string, GameObject> game_object_table = new Dictionary<string, GameObject>();
+            Dictionary<string, LocationComponent> location_component_table = new Dictionary<string, LocationComponent>();
+
+            for (int location_index = 0; location_index < _locationDataTable.Count; location_index++)
             {
-                LocationData data = location_datas[i];
+                LocationData location_data = _locationDataTable[location_index];
+                GameObject location_game_object = new GameObject(location_data._id);
+                LocationComponent location_component = new LocationComponent(location_data._name);
 
-                GameObject game_object = new GameObject(data._name);
-                LocationComponent location_component = new LocationComponent(data._id, data._name);
-                game_object.AddComponent(location_component);
+                location_game_object.AddComponent(location_component);
 
-                location_table.Add(data._id, location_component);
+                location_component_table.Add(location_data._id, location_component);
+                game_object_table.Add(location_data._id, location_game_object);
+
+                event_manager.TriggerEvent(new RegisterGameObjectGameEvent(location_game_object));
+                location_game_object.SetIsActive(true);
             }
 
-            for (int i = 0; i < location_datas.Count; i++)
+            for (int location_index = 0; location_index < _locationDataTable.Count; location_index++)
             {
-                LocationData data = location_datas[i];
+                LocationData location_data = _locationDataTable[location_index];
+                LocationComponent location_component = location_component_table[location_data._id];
 
-                if (data._parentId.Length > 0)
+                if (!string.IsNullOrEmpty(location_data._parentId))
                 {
-                    if (location_table.ContainsKey(data._id) == false || location_table.ContainsKey(data._parentId) == false)
-                    {
-                        throw new ArgumentException("Programmer error: Invalid location or parent ID in WorldBuilder.");
-                    }
+                    LocationComponent parent_location = location_component_table[location_data._parentId];
 
-                    LocationComponent child = location_table[data._id];
-                    LocationComponent parent = location_table[data._parentId];
-
-                    ConnectLocations(parent, child, data._travelMinutes);
+                    parent_location.AddConnection(location_component, location_data._travelMinutes);
+                }
+                else
+                {
+                    root_location = location_component;
                 }
             }
 
-            return location_table;
-        }
+            for (int shop_index = 0; shop_index < _shopDataTable.Count; shop_index++)
+            {
+                GameObject shop_game_object = game_object_table[_shopDataTable[shop_index]._locationId];
 
-        private static void ConnectLocations(LocationComponent parent, LocationComponent child, int travel_minutes)
-        {
-            parent.AddNeighbor(child, travel_minutes);
-            child.AddNeighbor(parent, travel_minutes);
+                shop_game_object.AddComponent(new ShopComponent(_shopDataTable[shop_index], _itemDataTable, shop_game_object));
+            }
+
+            return root_location;
         }
     }
 }

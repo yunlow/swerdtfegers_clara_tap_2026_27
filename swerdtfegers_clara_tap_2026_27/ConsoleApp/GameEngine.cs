@@ -1,14 +1,15 @@
 ﻿using activity_00_tap_26_27.Core;
+using activity_00_tap_26_27.Core.Events;
+using activity_00_tap_26_27.Data;
+using activity_00_tap_26_27.Render;
+using GameLibrary;
+using GameLibrary.CSV;
+using GameLibrary.States;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using static System.Collections.Specialized.BitVector32;
-using activity_00_tap_26_27.Core.Events;
-
-
-using GameLibrary;
-using activity_00_tap_26_27.Render;
-using GameLibrary.States;
 
 namespace activity_00_tap_26_27
 {
@@ -40,46 +41,103 @@ namespace activity_00_tap_26_27
         {
             _stopwatch.Start();
 
+            float last_time = GetCurrentTime();
             float lag = 0.0f;
 
-            float last_time = GetCurrentTime();
+            _eventManager.TriggerEvent(new LogMessageGameEvent("Game engine started."));
 
-            while (!_gameManager.GetShouldQuit())
+            ContentReport content_report = new ContentReport();
+
+            List<LocationData> location_data_table = null;
+            List<ShopData> shop_data_table = null;
+            List<ItemData> item_data_table = null;
+
             {
-                float loop_start_time = GetCurrentTime();
-                float elapsed_time = loop_start_time - last_time;
+                string locations_content = GetFileContent("locations.csv", content_report);
 
-                lag += elapsed_time;
-
-                ProcessInput();
-
-                while(lag >= FIXED_FRAME_TIME)
+                if (locations_content != null)
                 {
-                    FixedUpdate(FIXED_FRAME_TIME);
-                    lag -= FIXED_FRAME_TIME;
+                    CsvTable location_csv_table = CsvReader.Read("locations.csv", locations_content, content_report);
+
+                    if (location_csv_table != null)
+                    {
+                        location_data_table = LocationReader.Read(location_csv_table, content_report);
+                    }
                 }
-
-          
-                
-               
-
-                Update(elapsed_time);
-
-                Render();
-                
-                _gameManager.Update(elapsed_time);
-                _gameManager.FixedUpdate(FIXED_FRAME_TIME);
-
-                _eventManager.ProcessDelayedEvents();
-
-                last_time = loop_start_time;
-
-                _gameManager.GetShouldQuit();
             }
 
-            _logManager.Log("GameEngine.Run() - Game loop has exited.");
+            {
+                string shops_content = GetFileContent("shops.csv", content_report);
 
+                if (shops_content != null)
+                {
+                    CsvTable shop_csv_table = CsvReader.Read("shops.csv", shops_content, content_report);
+
+                    if (shop_csv_table != null)
+                    {
+                        shop_data_table = ShopReader.Read(shop_csv_table, location_data_table, content_report);
+                    }
+                }
+            }
+
+            {
+                string items_content = GetFileContent("items.csv", content_report);
+
+                if (items_content != null)
+                {
+                    CsvTable item_csv_table = CsvReader.Read("items.csv", items_content, content_report);
+
+                    if (item_csv_table != null)
+                    {
+                        item_data_table = ItemReader.Read(item_csv_table, shop_data_table, content_report);
+                    }
+                }
+            }
+
+            if (content_report.GetErrorCount() > 0)
+            {
+                for (int error_index = 0; error_index < content_report.GetErrorCount(); error_index++)
+                {
+                    _eventManager.TriggerEvent(new LogMessageGameEvent(content_report.GetErrorTextAtIndex(error_index)));
+                    Console.WriteLine(content_report.GetErrorTextAtIndex(error_index));
+                }
+            }
+            else
+            {
+                _gameManager = new GameManager(_eventManager);
+
+                _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
+                _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
+                _screenRenderers.Add(typeof(ShopOpenState), new ShopOpenRenderer());
+                _screenRenderers.Add(typeof(ShopClosedState), new ShopClosedRenderer());
+
+                while (!_gameManager.GetShouldQuit())
+                {
+                    float loop_start_time = GetCurrentTime();
+                    float elapsed_time = loop_start_time - last_time;
+
+                    lag += elapsed_time;
+
+                    ProcessInput();
+
+                    while (lag >= FIXED_FRAME_TIME)
+                    {
+                        FixedUpdate(FIXED_FRAME_TIME);
+
+                        _eventManager.ProcessDelayedEvents();
+
+                        lag -= FIXED_FRAME_TIME;
+                    }
+
+                    Update(elapsed_time);
+
+                    Render();
+
+                    last_time = loop_start_time;
+                }
+            }
         }
+
 
         private void ProcessInput()
         {
@@ -117,6 +175,30 @@ namespace activity_00_tap_26_27
                 }
             }
         }
+
+        private static string GetFileContent(string file_name, ContentReport content_report)
+        {
+            string file_content = null;
+            string file_path = $"../../../Data/{file_name}";
+
+            try
+            {
+                file_content = File.ReadAllText(file_path);
+            }
+            catch (FileNotFoundException exception)
+            {
+                content_report.AddError(file_name, -1, $"File not found: {exception.Message} at location {file_path}");
+                // Console.WriteLine($"File not found: {exception.Message}");
+            }
+            catch (Exception exception)
+            {
+                content_report.AddError(file_name, -1, $"An unexpected error happened: {exception.Message}");
+                // Console.WriteLine($"An unexpected error happened: {exception.Message}");
+            }
+
+            return file_content;
+        }
+
 
         private void FixedUpdate(float fixed_elapsed_time)
         {
