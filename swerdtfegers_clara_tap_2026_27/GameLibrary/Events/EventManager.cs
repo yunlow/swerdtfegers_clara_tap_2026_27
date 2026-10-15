@@ -57,15 +57,11 @@ namespace activity_00_tap_26_27.Core.Events
             while (_eventQueue.Count > 0)
             {
                 IGameEvent game_event = _eventQueue.Dequeue();
-                if (_eventTypeTable.TryGetValue(game_event.GetType(), out List<Action<IGameEvent>> actions))
-                {
-                    foreach (Action<IGameEvent> action in actions)
-                    {
-                        action(game_event);
-                    }
-                }
+
+                TriggerEvent(game_event);
             }
         }
+        
 
        
     }

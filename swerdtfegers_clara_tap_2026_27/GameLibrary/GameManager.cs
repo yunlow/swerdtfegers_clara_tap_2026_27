@@ -27,6 +27,12 @@ namespace activity_00_tap_26_27.Core
 
         private readonly WorldBuilder _worldBuilder;
         private int _fixedStepIndex = 0;
+        private ReplayPlayer _replayPlayer;
+
+        private readonly Dictionary<string, string> _saveTable = new Dictionary<string, string>();
+        private int _replaySpeed;
+        private Random _random;
+        private GameObject _heroObject;
 
         public GameManager(EventManager event_manager, WorldBuilder world_builder)
         {
@@ -51,18 +57,22 @@ namespace activity_00_tap_26_27.Core
 
       public void StartNewGame(int seed)
         {
-            _fixedStepIndex = 0;
-            new Random(seed);
-            _eventManager.TriggerEvent(new LogMessageGameEvent("New game started."));
-            LocationComponent root_location = _worldBuilder.Build(_eventManager);
-            _currentLocation = root_location;
-
-            _replayRecorder = new ReplayRecorder(seed, _eventManager, this);
-
-            if(_shouldQuit == true)
+            if (_replayRecorder != null)
             {
                 _replayRecorder.StopRecording();
+                _gameObjectTable.Clear();
             }
+
+            _eventManager.TriggerEvent(new LogMessageGameEvent($"New game started.  - seed {seed}"));
+
+            _random = new Random(seed);
+            _replayRecorder = new ReplayRecorder(seed, _eventManager, this);
+            _replayPlayer = null;
+            _fixedStepIndex = 0;
+            LocationComponent root_location = _worldBuilder.Build(_eventManager);
+            _heroObject = _heroBuilder.Build(_eventManager);
+
+            _currentLocation = root_location;
         }
 
         private void OnRegisterGameObjectGameEvent(IGameEvent game_event)
