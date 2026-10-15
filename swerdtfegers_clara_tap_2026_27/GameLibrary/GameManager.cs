@@ -94,7 +94,17 @@ namespace activity_00_tap_26_27.Core
             return _selectedChildLocationIndex;
         }
 
-       
+        public void LoadReplay(ReplayData replay_data)
+        {
+            StartNewGame(replay_data._seed);
+
+            _replayPlayer = new ReplayPlayer(replay_data, _eventManager, this);
+
+        }
+        public bool GetIsReplaying()
+        {
+            return _replayPlayer != null && !_replayPlayer.GetIsFinished(_fixedStepIndex);
+        }
 
         public void FixedUpdate(float fixed_elapsed_time)
         {
