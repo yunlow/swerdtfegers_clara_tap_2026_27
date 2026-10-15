@@ -3,6 +3,7 @@ using activity_00_tap_26_27.Core.Events;
 using activity_00_tap_26_27.Core.Events;
 using GameLibrary;
 using GameLibrary.Components;
+using GameLibrary.Replay;
 using GameLibrary.States;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace activity_00_tap_26_27.Core
         private StateMachine _gameFlowStateStateMachine;
         private bool _isMenuStateActive = true;
 
+        private ReplayRecorder _replayRecorder;
         private bool _shouldQuit = false;
 
         private readonly WorldBuilder _worldBuilder;
@@ -54,6 +56,13 @@ namespace activity_00_tap_26_27.Core
             _eventManager.TriggerEvent(new LogMessageGameEvent("New game started."));
             LocationComponent root_location = _worldBuilder.Build(_eventManager);
             _currentLocation = root_location;
+
+            _replayRecorder = new ReplayRecorder(seed, _eventManager, this);
+
+            if(_shouldQuit == true)
+            {
+                _replayRecorder.StopRecording();
+            }
         }
 
         private void OnRegisterGameObjectGameEvent(IGameEvent game_event)
