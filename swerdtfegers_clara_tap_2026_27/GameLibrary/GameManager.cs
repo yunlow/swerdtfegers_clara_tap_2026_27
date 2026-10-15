@@ -1,6 +1,7 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
 using activity_00_tap_26_27.Core.Events;
+using GameLibrary;
 using GameLibrary.Components;
 using GameLibrary.States;
 using System;
@@ -22,9 +23,12 @@ namespace activity_00_tap_26_27.Core
 
         private bool _shouldQuit = false;
 
-        public GameManager(EventManager event_manager)
+        private readonly WorldBuilder _worldBuilder;
+
+        public GameManager(EventManager event_manager, WorldBuilder world_builder)
         {
             _eventManager = event_manager;
+            _worldBuilder = world_builder;
             _gameFlowStateStateMachine = new StateMachine(_eventManager);
             _gameFlowStateStateMachine.SetInitialState(new MainMenuState(this, _eventManager, _gameFlowStateStateMachine));
 
@@ -42,24 +46,11 @@ namespace activity_00_tap_26_27.Core
 
         public void StartExploration()
         {
-            string file_path = Path.GetFullPath("../../../Data/locations.csv");
-            if (!File.Exists(file_path))
-            {
-                Console.WriteLine($"file locations.csv not found at {file_path}");
-            }
-            else
-            {
-                try
-                {
-                    string content = File.ReadAllText(file_path);
-                }
-                catch (IOException)
-                {
-                    // Cas réel : le fichier est encore ouvert.
-                    Console.WriteLine($"locations.csv cannot be read. Close it in your spreadsheet and try again.");
-                }
+            _eventManager.TriggerEvent(new LogMessageGameEvent("Game manager started."));
 
-            }
+            LocationComponent root_location = _worldBuilder.Build(_eventManager);
+
+            _currentLocation = root_location;
         }
 
       
@@ -124,6 +115,7 @@ namespace activity_00_tap_26_27.Core
         public void SetCurrentLocation(LocationComponent location_component)
         {
             _currentLocation = location_component;
+            SetSelectedChildLocationIndex(-1);
         }
         public void SetIsMenuStateActive(bool is_menu_state_active)
         {

@@ -20,7 +20,8 @@ namespace activity_00_tap_26_27
         private EventManager _eventManager;
         private LogManager _logManager;
         private GameManager _gameManager;
-       
+        private WorldBuilder _worldBuilder;
+
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
        
@@ -104,7 +105,7 @@ namespace activity_00_tap_26_27
             }
             else
             {
-                _gameManager = new GameManager(_eventManager);
+                _gameManager = new GameManager(_eventManager, _worldBuilder);
 
                 _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
                 _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));

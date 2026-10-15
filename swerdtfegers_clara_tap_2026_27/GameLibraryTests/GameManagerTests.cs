@@ -12,7 +12,8 @@ namespace GameLibraryTests
         public void GetSelectedDestinationIndex_ReturnMinusOneAfterConstruction()
         {
             EventManager event_manager = new EventManager();
-            GameManager game_manager = new GameManager(event_manager);
+            
+            GameManager game_manager = new GameManager(event_manager, null);
 
             Assert.That(game_manager.GetSelectedDestinationIndex(), Is.EqualTo(-1));
         }
@@ -21,7 +22,8 @@ namespace GameLibraryTests
         public void GetSelectedDestinationIndex_ReturnMinusOneAfterConfirmCommand()
         {
             EventManager event_manager = new EventManager();
-            GameManager game_manager = new GameManager(event_manager);
+
+            GameManager game_manager = new GameManager(event_manager, null);
 
             event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.CONFIRM));
 
@@ -32,7 +34,7 @@ namespace GameLibraryTests
         public void GetSelectedDestinationIndex_ReturnZeroAfterNavigateDownCommand()
         {
             EventManager event_manager = new EventManager();
-            GameManager game_manager = new GameManager(event_manager);
+            GameManager game_manager = new GameManager(event_manager, null);
 
             event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.NAVIGATE_DOWN));
 
@@ -43,7 +45,7 @@ namespace GameLibraryTests
         public void GetCurrentLocation_ReturnChildAfterNavigateDownAndConfirmCommand()
         {
             EventManager event_manager = new EventManager();
-            GameManager game_manager = new GameManager(event_manager);
+            GameManager game_manager = new GameManager(event_manager, null);
             LocationComponent initial_location = game_manager.GetCurrentLocation();
 
             event_manager.TriggerEvent(new GameActionGameEvent(GameActionType.NAVIGATE_DOWN));
