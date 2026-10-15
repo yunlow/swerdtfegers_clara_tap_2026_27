@@ -10,7 +10,7 @@ using System.IO;
 
 namespace activity_00_tap_26_27.Core
 {
-    public class GameManager
+    public class GameManager : IFixedStepClock
     {
         private readonly EventManager _eventManager;
         private readonly List<GameObject> _gameObjectTable = new List<GameObject>();
@@ -24,6 +24,7 @@ namespace activity_00_tap_26_27.Core
         private bool _shouldQuit = false;
 
         private readonly WorldBuilder _worldBuilder;
+        private int _fixedStepIndex = 0;
 
         public GameManager(EventManager event_manager, WorldBuilder world_builder)
         {
@@ -44,16 +45,16 @@ namespace activity_00_tap_26_27.Core
 
         }
 
-        public void StartExploration()
+       
+
+      public void StartNewGame(int seed)
         {
-            _eventManager.TriggerEvent(new LogMessageGameEvent("Game manager started."));
-
+            _fixedStepIndex = 0;
+            new Random(seed);
+            _eventManager.TriggerEvent(new LogMessageGameEvent("New game started."));
             LocationComponent root_location = _worldBuilder.Build(_eventManager);
-
             _currentLocation = root_location;
         }
-
-      
 
         private void OnRegisterGameObjectGameEvent(IGameEvent game_event)
         {
@@ -78,6 +79,7 @@ namespace activity_00_tap_26_27.Core
 
         public void FixedUpdate(float fixed_elapsed_time)
         {
+            _fixedStepIndex++;
             for (int object_index = 0; object_index < _gameObjectTable.Count; object_index++)
             {
                 GameObject game_object = _gameObjectTable[object_index];
@@ -87,6 +89,11 @@ namespace activity_00_tap_26_27.Core
                     game_object.FixedUpdate(fixed_elapsed_time);
                 }
             }
+        }
+
+        public int GetFixedStepIndex()
+        {
+            return _fixedStepIndex;
         }
 
         public void Update(float elapsed_time)
