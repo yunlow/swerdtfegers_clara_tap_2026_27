@@ -6,7 +6,7 @@ using System.Text;
 
 namespace activity_00_tap_26_27.Render
 {
-    public class ShopClosedRenderer : IScreenRenderer
+    public class ShopClosedRenderer
     {
         public void Render(IState state, ConsoleRenderManager render_manager)
         {

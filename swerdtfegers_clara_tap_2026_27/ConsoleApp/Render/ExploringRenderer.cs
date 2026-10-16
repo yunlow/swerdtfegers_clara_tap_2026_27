@@ -7,7 +7,7 @@ using System;
 
 namespace ConsoleGame.Render
 {
-    public class ExploringRenderer : IScreenRenderer
+    public class ExploringRenderer
     {
         public void Render(IState state, ConsoleRenderManager render_manager)
         {

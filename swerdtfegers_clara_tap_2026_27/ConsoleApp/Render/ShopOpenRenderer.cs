@@ -5,7 +5,7 @@ using System;
 
 namespace ConsoleGame.Render
 {
-    public class ShopOpenRenderer : IScreenRenderer
+    public class ShopOpenRenderer
     {
         public void Render(IState state, ConsoleRenderManager render_manager)
         {

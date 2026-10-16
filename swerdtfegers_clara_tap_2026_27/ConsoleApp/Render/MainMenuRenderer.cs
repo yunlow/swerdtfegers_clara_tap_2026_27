@@ -7,10 +7,10 @@ using System.Text;
 
 namespace activity_00_tap_26_27.Render
 {
-    public class MainMenuRenderer : IScreenRenderer
+    public class MainMenuRenderer
     {
         private GameManager _gameManager;
-        public MainMenuRenderer(GameManager game_manager)
+        public MainMenuRenderer(GameManager game_manager, ConsoleRenderManager render_manager)
         {
             _gameManager = game_manager;
         }
