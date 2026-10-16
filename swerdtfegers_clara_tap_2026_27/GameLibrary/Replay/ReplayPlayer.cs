@@ -20,7 +20,7 @@ namespace GameLibrary.Replay
 
         }
 
-        public void TriggerActionsOfStep(int fixed_setp_index, EventManager event_manager)
+        public void TriggerActionsOfStep(int fixed_step_index, EventManager event_manager)
         {
             while ((_replayData._actionTable.Count > _currentReplayIndex) && (_replayData._actionTable[_currentReplayIndex]._fixedStepIndex <= fixed_step_index))
             {

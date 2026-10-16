@@ -2,6 +2,7 @@
 using activity_00_tap_26_27.Core.Events;
 using activity_00_tap_26_27.Data;
 using activity_00_tap_26_27.Render;
+using ConsoleGame;
 using GameLibrary;
 using GameLibrary.CSV;
 using GameLibrary.States;
@@ -23,19 +24,37 @@ namespace activity_00_tap_26_27
         private WorldBuilder _worldBuilder;
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
+        private SaveFileWriter _saveFileWriter;
+        private SaveFileLoader _saveFileLoader;
 
-       
         private Dictionary<Type, IScreenRenderer> _screenRenderers = new Dictionary<Type, IScreenRenderer>();
 
         private readonly ConsoleRenderManager _renderManager = new ConsoleRenderManager();
+        private static readonly string ROOT_DIRECTORY_PATH = "../../../";
+        private static readonly string SAVES_DIRECTORY_PATH = $"{ROOT_DIRECTORY_PATH}Saves/";
+        private static readonly string DATA_DIRECTORY_PATH = $"{ROOT_DIRECTORY_PATH}Data/";
+        private static readonly string LOG_FILE_PATH = $"{ROOT_DIRECTORY_PATH}debug.log";
 
 
-     public GameEngine()
+        public GameEngine()
         {
             _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
             _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
 
-            
+            _logManager = new LogManager(_eventManager, new LogFileWriter());
+
+        }
+        private CsvTable ReadCsvTableFromFile(string file_name, ContentReport content_report)
+        {
+            CsvTable csv_table = null;
+            string file_content = GetFileContent(file_name, content_report);
+
+            if (file_content != null)
+            {
+                csv_table = CsvReader.Read(file_name, file_content, content_report);
+            }
+
+            return csv_table;
         }
 
         public void Run()
@@ -49,49 +68,50 @@ namespace activity_00_tap_26_27
 
             ContentReport content_report = new ContentReport();
 
-            List<LocationData> location_data_table = null;
-            List<ShopData> shop_data_table = null;
-            List<ItemData> item_data_table = null;
+            GameContentData game_content_data = new GameContentData();
 
             {
-                string locations_content = GetFileContent("locations.csv", content_report);
+                CsvTable location_csv_table = ReadCsvTableFromFile("locations.csv", content_report);
 
-                if (locations_content != null)
+                if (location_csv_table != null)
                 {
-                    CsvTable location_csv_table = CsvReader.Read("locations.csv", locations_content, content_report);
-
-                    if (location_csv_table != null)
-                    {
-                        location_data_table = LocationReader.Read(location_csv_table, content_report);
-                    }
+                    game_content_data._locationDataTable = LocationReader.Read(location_csv_table, content_report);
                 }
             }
 
             {
-                string shops_content = GetFileContent("shops.csv", content_report);
+                CsvTable shop_csv_table = ReadCsvTableFromFile("shops.csv", content_report);
 
-                if (shops_content != null)
+                if (shop_csv_table != null)
                 {
-                    CsvTable shop_csv_table = CsvReader.Read("shops.csv", shops_content, content_report);
-
-                    if (shop_csv_table != null)
-                    {
-                        shop_data_table = ShopReader.Read(shop_csv_table, location_data_table, content_report);
-                    }
+                    game_content_data._shopDataTable = ShopReader.Read(shop_csv_table, game_content_data._locationDataTable, content_report);
                 }
             }
 
             {
-                string items_content = GetFileContent("items.csv", content_report);
+                CsvTable item_csv_table = ReadCsvTableFromFile("items.csv", content_report);
 
-                if (items_content != null)
+                if (item_csv_table != null)
                 {
-                    CsvTable item_csv_table = CsvReader.Read("items.csv", items_content, content_report);
+                    game_content_data._itemDataTable = ItemReader.Read(item_csv_table, content_report);
+                }
+            }
 
-                    if (item_csv_table != null)
-                    {
-                        item_data_table = ItemReader.Read(item_csv_table, shop_data_table, content_report);
-                    }
+            {
+                CsvTable hero_csv_table = ReadCsvTableFromFile("heroes.csv", content_report);
+
+                if (hero_csv_table != null)
+                {
+                    game_content_data._heroDataTable = HeroReader.Read(hero_csv_table, game_content_data._locationDataTable, content_report);
+                }
+            }
+
+            {
+                CsvTable inventory_csv_table = ReadCsvTableFromFile("inventories.csv", content_report);
+
+                if (inventory_csv_table != null)
+                {
+                    game_content_data._inventoryDataTable = InventoryReader.Read(inventory_csv_table, game_content_data._shopDataTable, game_content_data._heroDataTable, game_content_data._itemDataTable, content_report);
                 }
             }
 
@@ -105,38 +125,59 @@ namespace activity_00_tap_26_27
             }
             else
             {
-                _gameManager = new GameManager(_eventManager, _worldBuilder);
+                _gameManager = new GameManager(_eventManager, game_content_data);
+
+                _saveFileWriter = new SaveFileWriter(SAVES_DIRECTORY_PATH, _gameManager, _eventManager);
+                _saveFileLoader = new SaveFileLoader(SAVES_DIRECTORY_PATH, _gameManager, _eventManager);
+                _saveFileLoader.LoadAllSaves();
+
+                _gameManager.ShowMenu();
 
                 _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
                 _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
                 _screenRenderers.Add(typeof(ShopOpenState), new ShopOpenRenderer());
                 _screenRenderers.Add(typeof(ShopClosedState), new ShopClosedRenderer());
 
-                while (!_gameManager.GetShouldQuit())
+                try
                 {
-                    float loop_start_time = GetCurrentTime();
-                    float elapsed_time = loop_start_time - last_time;
-
-                    lag += elapsed_time;
-
-                    ProcessInput();
-
-                    while (lag >= FIXED_FRAME_TIME)
+                    while (!_gameManager.GetShouldQuit())
                     {
-                        FixedUpdate(FIXED_FRAME_TIME);
+                        float loop_start_time = GetCurrentTime();
+                        float elapsed_time = loop_start_time - last_time;
 
-                        _eventManager.ProcessDelayedEvents();
+                        ProcessInput();
 
-                        lag -= FIXED_FRAME_TIME;
+                        if (_gameManager.GetIsReplaying())
+                        {
+                            elapsed_time *= _gameManager.GetReplaySpeed();
+                        }
+
+                        lag += elapsed_time;
+
+                        while (lag >= FIXED_FRAME_TIME)
+                        {
+                            FixedUpdate(FIXED_FRAME_TIME);
+
+                            _eventManager.ProcessDelayedEvents();
+
+                            lag -= FIXED_FRAME_TIME;
+                        }
+
+                        Update(elapsed_time);
+
+                        Render();
+
+                        last_time = loop_start_time;
                     }
-
-                    Update(elapsed_time);
-
-                    Render();
-
-                    last_time = loop_start_time;
+                }
+                catch (Exception exception)
+                {
+                    _saveFileWriter.WriteCrashSave(_gameManager.GetSaveText());
+                    _eventManager.TriggerEvent(new LogMessageGameEvent(($"The game crashed: {exception.Message}")));
+                    throw;
                 }
             }
+
         }
 
 

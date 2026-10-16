@@ -1,32 +1,32 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
-using activity_00_tap_26_27.Core.Events;
-using GameLibrary;
 using GameLibrary.Components;
+using GameLibrary.Csv;
+using GameLibrary.CSV;
+using GameLibrary.Data;
+using GameLibrary.Events;
 using GameLibrary.Replay;
 using GameLibrary.States;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
-namespace activity_00_tap_26_27.Core
+namespace GameLibrary
 {
     public class GameManager : IFixedStepClock
     {
         private readonly EventManager _eventManager;
+        private readonly StateMachine _gameFlowStateStateMachine;
         private readonly List<GameObject> _gameObjectTable = new List<GameObject>();
 
         private LocationComponent _currentLocation;
         private int _selectedChildLocationIndex = -1;
+        private int _fixedStepIndex = 0;
 
-        private StateMachine _gameFlowStateStateMachine;
-        private bool _isMenuStateActive = true;
-
-        private ReplayRecorder _replayRecorder;
         private bool _shouldQuit = false;
 
         private readonly WorldBuilder _worldBuilder;
-        private int _fixedStepIndex = 0;
+        private readonly HeroBuilder _heroBuilder;
+        private ReplayRecorder _replayRecorder;
         private ReplayPlayer _replayPlayer;
 
         private readonly Dictionary<string, string> _saveTable = new Dictionary<string, string>();
@@ -34,28 +34,18 @@ namespace activity_00_tap_26_27.Core
         private Random _random;
         private GameObject _heroObject;
 
-        public GameManager(EventManager event_manager, WorldBuilder world_builder)
+        public GameManager(EventManager event_manager, GameContentData game_content_data)
         {
             _eventManager = event_manager;
-            _worldBuilder = world_builder;
-            _gameFlowStateStateMachine = new StateMachine(_eventManager);
-            _gameFlowStateStateMachine.SetInitialState(new MainMenuState(this, _eventManager, _gameFlowStateStateMachine));
+            _worldBuilder = new WorldBuilder(game_content_data);
+            _heroBuilder = new HeroBuilder(game_content_data);
 
-            event_manager.RegisterToEvent<RegisterGameObjectGameEvent>(OnRegisterGameObjectGameEvent);
-            event_manager.RegisterToEvent<UnregisterGameObjectGameEvent>(OnUnregisterGameObjectGameEvent);
+            _gameFlowStateStateMachine = new StateMachine(_eventManager);
 
             event_manager.TriggerEvent(new LogMessageGameEvent("Game manager started."));
-
-            GameObject test_game_object = new GameObject("test_game_objet");
-
-            event_manager.TriggerDelayedEvent(new RegisterGameObjectGameEvent(test_game_object));
-
-
         }
 
-       
-
-      public void StartNewGame(int seed)
+        public void StartNewGame(int seed)
         {
             if (_replayRecorder != null)
             {
@@ -75,6 +65,46 @@ namespace activity_00_tap_26_27.Core
             _currentLocation = root_location;
         }
 
+        public InventoryComponent GetHeroInventory()
+        {
+            return _heroObject.GetComponent<InventoryComponent>();
+        }
+
+        public WalletComponent GetHeroWallet()
+        {
+            return _heroObject.GetComponent<WalletComponent>();
+        }
+
+        public string GetSaveText()
+        {
+            string save_text = "";
+
+            if (_replayRecorder != null)
+            {
+                save_text = _replayRecorder.GetCsvTextWithoutEnd();
+            }
+
+            return save_text;
+        }
+
+        public void LoadReplay(ReplayData replay_data)
+        {
+            StartNewGame(replay_data._seed);
+
+            _replayPlayer = new ReplayPlayer(replay_data, _eventManager, this);
+
+        }
+
+        public IState GetCurrentGameFlowState()
+        {
+            return _gameFlowStateStateMachine.GetCurrentState();
+        }
+
+        public int GetSelectedDestinationIndex()
+        {
+            return _selectedChildLocationIndex;
+        }
+
         private void OnRegisterGameObjectGameEvent(IGameEvent game_event)
         {
             RegisterGameObjectGameEvent register_game_object_game_event = game_event as RegisterGameObjectGameEvent;
@@ -89,26 +119,12 @@ namespace activity_00_tap_26_27.Core
             _gameObjectTable.Remove(unregister_game_object_game_event._gameObject);
         }
 
-        public int GetSelectedDestinationIndex()
-        {
-            return _selectedChildLocationIndex;
-        }
-
-        public void LoadReplay(ReplayData replay_data)
-        {
-            StartNewGame(replay_data._seed);
-
-            _replayPlayer = new ReplayPlayer(replay_data, _eventManager, this);
-
-        }
-        public bool GetIsReplaying()
-        {
-            return _replayPlayer != null && !_replayPlayer.GetIsFinished(_fixedStepIndex);
-        }
-
         public void FixedUpdate(float fixed_elapsed_time)
         {
-            _fixedStepIndex++;
+            ++_fixedStepIndex;
+
+            _gameFlowStateStateMachine.FixedUpdate(fixed_elapsed_time);
+
             for (int object_index = 0; object_index < _gameObjectTable.Count; object_index++)
             {
                 GameObject game_object = _gameObjectTable[object_index];
@@ -118,15 +134,17 @@ namespace activity_00_tap_26_27.Core
                     game_object.FixedUpdate(fixed_elapsed_time);
                 }
             }
-        }
 
-        public int GetFixedStepIndex()
-        {
-            return _fixedStepIndex;
+            if (_replayPlayer != null)
+            {
+                _replayPlayer.FixedUpdate(fixed_elapsed_time);
+            }
         }
 
         public void Update(float elapsed_time)
         {
+            _gameFlowStateStateMachine.Update(elapsed_time);
+
             for (int object_index = 0; object_index < _gameObjectTable.Count; object_index++)
             {
                 GameObject game_object = _gameObjectTable[object_index];
@@ -142,37 +160,97 @@ namespace activity_00_tap_26_27.Core
         {
             return _currentLocation;
         }
-        public void SetSelectedChildLocationIndex(int selected_child_location_index)
-        {
-            _selectedChildLocationIndex = selected_child_location_index;
-        }
-
-
-        public void SetCurrentLocation(LocationComponent location_component)
-        {
-            _currentLocation = location_component;
-            SetSelectedChildLocationIndex(-1);
-        }
-        public void SetIsMenuStateActive(bool is_menu_state_active)
-        {
-            _isMenuStateActive = is_menu_state_active;
-        }
-        public bool GetIsMenuStateActive()
-        {
-            return _isMenuStateActive;
-        }
-        public void RequestQuit()
-        {
-            _shouldQuit = true;
-        }   
 
         public bool GetShouldQuit()
         {
             return _shouldQuit;
         }
-        public IState GetCurrentGameFlowState()
+
+        public void RequestQuit()
         {
-            return _gameFlowStateStateMachine as IState;
+            _shouldQuit = true;
+        }
+
+        public void SetSelectedChildLocationIndex(int selected_child_location_index)
+        {
+            _selectedChildLocationIndex = selected_child_location_index;
+        }
+
+        public void SetCurrentLocation(LocationComponent current_location)
+        {
+            _currentLocation = current_location;
+            SetSelectedChildLocationIndex(-1);
+        }
+
+        public void RequestSave()
+        {
+            string save_text = _replayRecorder.GetCsvText(_fixedStepIndex);
+
+            _eventManager.TriggerEvent(new SaveRequestedGameEvent(save_text));
+        }
+
+        public void AddSave(string save_file_path, string save_content)
+        {
+            ContentReport content_report = new ContentReport();
+            CsvTable csv_table = CsvReader.Read(save_file_path, save_content, content_report);
+            ReplayData replay_save_data = ReplayReader.Read(csv_table, content_report);
+
+            if (content_report.GetErrorCount() > 0)
+            {
+                save_file_path += " (damaged)";
+
+                for (int error_index = 0; error_index < content_report.GetErrorCount(); error_index++)
+                {
+                    _eventManager.TriggerEvent(new LogMessageGameEvent(content_report.GetErrorTextAtIndex(error_index)));
+                }
+            }
+
+            _saveTable.Add(save_file_path, save_content);
+        }
+
+        public Dictionary<string, string> GetSaveTable()
+        {
+            return _saveTable;
+        }
+
+        public int GetFixedStepIndex()
+        {
+            return _fixedStepIndex;
+        }
+
+        public void EndGame()
+        {
+            _replayRecorder.StopRecording();
+            SetCurrentLocation(null);
+            RequestSave();
+        }
+
+        public void SetReplaySpeed(int replay_speed)
+        {
+            _replaySpeed = replay_speed;
+        }
+
+        public bool GetIsReplaying()
+        {
+            return _replayPlayer != null && !_replayPlayer.GetIsFinished(_fixedStepIndex);
+        }
+
+        public int GetReplaySpeed()
+        {
+            return _replaySpeed;
+        }
+
+        public void ShowMenu()
+        {
+            _gameFlowStateStateMachine.SetInitialState(new MainMenuState(_gameFlowStateStateMachine, this, _eventManager));
+
+            _eventManager.RegisterToEvent<RegisterGameObjectGameEvent>(OnRegisterGameObjectGameEvent);
+            _eventManager.RegisterToEvent<UnregisterGameObjectGameEvent>(OnUnregisterGameObjectGameEvent);
+        }
+
+        public GameObject GetHeroObject()
+        {
+            return _heroObject;
         }
     }
 }
