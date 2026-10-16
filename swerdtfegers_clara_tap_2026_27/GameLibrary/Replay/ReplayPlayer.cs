@@ -1,23 +1,24 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using GameLibrary.Events;
 
 namespace GameLibrary.Replay
 {
     public class ReplayPlayer
     {
         private ReplayData _replayData;
-        private EventManager _eventManager;
-        private IFixedStepClock _fixedStepClock;
         private int _currentReplayIndex;
+        private IFixedStepClock _fixedStepClock;
+
+        public ReplayActionData _replayActionData;
+
+        private EventManager _eventManager;
+
         public ReplayPlayer(ReplayData replay_data, EventManager event_manager, IFixedStepClock fixed_step_clock)
         {
-            _replayData = replay_data;
             _eventManager = event_manager;
+            _replayData = replay_data;
             _fixedStepClock = fixed_step_clock;
-
         }
 
         public void TriggerActionsOfStep(int fixed_step_index, EventManager event_manager)
@@ -32,8 +33,6 @@ namespace GameLibrary.Replay
                 }
 
                 ++_currentReplayIndex;
-            }
-            event_manager.TriggerEvent(action);
             }
         }
 
@@ -60,6 +59,5 @@ namespace GameLibrary.Replay
                 TriggerActionsOfStep(_fixedStepClock.GetFixedStepIndex(), _eventManager);
             }
         }
-
     }
 }
