@@ -1,8 +1,21 @@
-﻿namespace GameLibrary.Components
+﻿using activity_00_tap_26_27.Core;
+
+namespace GameLibrary.Components
 {
     public abstract class Component
     {
         private bool _isActive = true;
+        private GameObject _gameObject;
+
+        protected Component(GameObject game_object)
+        {
+            _gameObject = game_object;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return _gameObject;
+        }
 
         public virtual void Update(float elapsed_time)
         {
