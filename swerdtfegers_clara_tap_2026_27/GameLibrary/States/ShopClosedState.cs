@@ -1,9 +1,7 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
 using GameLibrary.Components;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using GameLibrary.Events;
 
 namespace GameLibrary.States
 {
@@ -11,13 +9,15 @@ namespace GameLibrary.States
     {
         private readonly StateMachine _stateMachine;
         private readonly ShopComponent _shopComponent;
+        private readonly InventoryComponent _inventoryComponent;
         private readonly GameManager _gameManager;
         private readonly EventManager _eventManager;
 
-        public ShopClosedState(StateMachine state_machine, ShopComponent shop_component, GameManager game_manager, EventManager event_manager)
+        public ShopClosedState(StateMachine state_machine, ShopComponent shop_component, InventoryComponent inventory_component, GameManager game_manager, EventManager event_manager)
         {
             _stateMachine = state_machine;
             _shopComponent = shop_component;
+            _inventoryComponent = inventory_component;
             _gameManager = game_manager;
             _eventManager = event_manager;
         }
@@ -33,7 +33,7 @@ namespace GameLibrary.States
 
             if ((game_action_game_event._gameActionType == GameActionType.CANCEL) || (game_action_game_event._gameActionType == GameActionType.QUIT))
             {
-                _gameManager.SetCurrentLocation(null);
+                _gameManager.SetCurrentLocation(_shopComponent.GetGameObject().GetComponent<LocationComponent>().GetParentLocation());
                 _stateMachine.ChangeState(new ExploringState(_stateMachine, _gameManager, _eventManager));
             }
         }
@@ -45,9 +45,9 @@ namespace GameLibrary.States
 
         public void FixedUpdate(float fixed_elapsed_time)
         {
-            if (!_shopComponent.GetIsOpen())
+            if (_shopComponent.GetIsOpen())
             {
-                _stateMachine.ChangeState(new ShopOpenState(_stateMachine, _shopComponent, _gameManager, _eventManager));
+                _stateMachine.ChangeState(new ShopOpenState(_stateMachine, _shopComponent, _inventoryComponent, _gameManager, _eventManager));
             }
         }
 
@@ -59,6 +59,16 @@ namespace GameLibrary.States
         public ShopComponent GetShopComponent()
         {
             return _shopComponent;
+        }
+
+        public bool GetIsReplaying()
+        {
+            return _gameManager.GetIsReplaying();
+        }
+
+        public int GetReplaySpeed()
+        {
+            return _gameManager.GetReplaySpeed();
         }
     }
 }

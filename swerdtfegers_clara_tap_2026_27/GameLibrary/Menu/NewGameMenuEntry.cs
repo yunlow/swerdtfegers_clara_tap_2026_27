@@ -7,7 +7,7 @@ using System.Text;
 
 namespace GameLibrary.Menu
 {
-    public class NewGameMenuEntry
+    public class NewGameMenuEntry : IMenuEntry
     {
         private GameManager _gameManager;
         private StateMachine _stateMachine;

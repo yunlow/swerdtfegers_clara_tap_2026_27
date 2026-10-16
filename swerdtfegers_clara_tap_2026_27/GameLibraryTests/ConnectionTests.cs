@@ -10,7 +10,7 @@ public class ConnectionTests
     private LocationComponent CreateLocation(string location_name)
     {
         GameObject location_game_object = new GameObject(location_name);
-        LocationComponent location_component = new LocationComponent(location_name);
+        LocationComponent location_component = new LocationComponent(location_name, location_game_object);
 
         location_game_object.AddComponent(location_component);
 

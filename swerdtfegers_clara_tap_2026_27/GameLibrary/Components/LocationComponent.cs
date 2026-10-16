@@ -1,38 +1,17 @@
 ﻿using activity_00_tap_26_27.Core;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameLibrary.Components
 {
     public class LocationComponent : Component
     {
         private string _locationName;
-        private readonly List<Connection> _connectionTable = new List<Connection>();
         private LocationComponent _parentLocation;
+        private readonly List<Connection> _connectionTable = new List<Connection>();
 
-
-        public LocationComponent(string location_name)
+        public LocationComponent(string location_name, GameObject game_object) : base(game_object)
         {
             _locationName = location_name;
-        }
-
-        public void AddConnection(LocationComponent location_component, float travel_duration)
-        {
-            _connectionTable.Add(new Connection(location_component, travel_duration));
-            location_component.SetParentLocation(this);
-        }
-
-        private void SetParentLocation(LocationComponent parent_location)
-        {
-            _parentLocation = parent_location;
-        }
-
-        public LocationComponent GetParentLocation()
-        {
-            return _parentLocation;
         }
 
         public string GetName()
@@ -50,6 +29,20 @@ namespace GameLibrary.Components
             return _connectionTable[location_index];
         }
 
-      
+        public void AddLocation(LocationComponent location_component, float travel_duration)
+        {
+            _connectionTable.Add(new Connection(location_component, travel_duration));
+            location_component.SetParentLocation(this);
+        }
+
+        private void SetParentLocation(LocationComponent parent_location)
+        {
+            _parentLocation = parent_location;
+        }
+
+        public LocationComponent GetParentLocation()
+        {
+            return _parentLocation;
+        }
     }
 }

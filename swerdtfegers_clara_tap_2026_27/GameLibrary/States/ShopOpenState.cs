@@ -1,9 +1,9 @@
 ﻿using activity_00_tap_26_27.Core;
 using activity_00_tap_26_27.Core.Events;
+using activity_00_tap_26_27.Data;
 using GameLibrary.Components;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using GameLibrary.Data;
+using GameLibrary.Events;
 
 namespace GameLibrary.States
 {
@@ -11,16 +11,18 @@ namespace GameLibrary.States
     {
         private readonly StateMachine _stateMachine;
         private readonly ShopComponent _shopComponent;
+        private readonly InventoryComponent _inventoryComponent;
         private readonly GameManager _gameManager;
         private readonly EventManager _eventManager;
 
         private int _selectedItemIndex = -1;
         private string _currentSpeech = "";
 
-        public ShopOpenState(StateMachine state_machine, ShopComponent shop_component, GameManager game_manager, EventManager event_manager)
+        public ShopOpenState(StateMachine state_machine, ShopComponent shop_component, InventoryComponent inventory_component, GameManager game_manager, EventManager event_manager)
         {
             _stateMachine = state_machine;
             _shopComponent = shop_component;
+            _inventoryComponent = inventory_component;
             _gameManager = game_manager;
             _eventManager = event_manager;
         }
@@ -36,24 +38,26 @@ namespace GameLibrary.States
 
             if ((game_action_game_event._gameActionType == GameActionType.CANCEL) || (game_action_game_event._gameActionType == GameActionType.QUIT))
             {
-                _gameManager.SetCurrentLocation(null);
+                _gameManager.SetCurrentLocation(_shopComponent.GetGameObject().GetComponent<LocationComponent>().GetParentLocation());
                 _stateMachine.ChangeState(new ExploringState(_stateMachine, _gameManager, _eventManager));
             }
             else if (game_action_game_event._gameActionType == GameActionType.NAVIGATE_UP)
             {
-                _selectedItemIndex = (_selectedItemIndex - 1 + _shopComponent.GetItemCount()) % _shopComponent.GetItemCount();
+                _selectedItemIndex = (_selectedItemIndex - 1 + _inventoryComponent.GetEntryCount()) % _inventoryComponent.GetEntryCount();
             }
             else if (game_action_game_event._gameActionType == GameActionType.NAVIGATE_DOWN)
             {
-                _selectedItemIndex = (_selectedItemIndex + 1) % _shopComponent.GetItemCount();
+                _selectedItemIndex = (_selectedItemIndex + 1) % _inventoryComponent.GetEntryCount();
             }
             else if (game_action_game_event._gameActionType == GameActionType.CONFIRM)
             {
-                if ((_selectedItemIndex >= 0) && (_selectedItemIndex < _shopComponent.GetItemCount()))
+                if ((_selectedItemIndex >= 0) && (_selectedItemIndex < _inventoryComponent.GetEntryCount()))
                 {
-                    if (_shopComponent.TryRemoveOneAtIndex(_selectedItemIndex))
+                    ItemData item_data = _inventoryComponent.GetEntryAtIndex(_selectedItemIndex).GetItem();
+
+                    if (_inventoryComponent.TryRemove(item_data._id, 1))
                     {
-                        _currentSpeech = $"You bought {_shopComponent.GetItemAtIndex(_selectedItemIndex)._name} for {_shopComponent.GetItemAtIndex(_selectedItemIndex)._price}$";
+                        _currentSpeech = $"You bought {item_data._name} for {item_data._price}$";
                     }
                 }
             }
@@ -68,7 +72,7 @@ namespace GameLibrary.States
         {
             if (!_shopComponent.GetIsOpen())
             {
-                _stateMachine.ChangeState(new ShopClosedState(_stateMachine, _shopComponent, _gameManager, _eventManager));
+                _stateMachine.ChangeState(new ShopClosedState(_stateMachine, _shopComponent, _inventoryComponent, _gameManager, _eventManager));
             }
         }
 
@@ -82,6 +86,11 @@ namespace GameLibrary.States
             return _shopComponent;
         }
 
+        public InventoryComponent GetInventoryComponent()
+        {
+            return _inventoryComponent;
+        }
+
         public int GetSelectedItemIndex()
         {
             return _selectedItemIndex;
@@ -91,6 +100,15 @@ namespace GameLibrary.States
         {
             return _currentSpeech;
         }
-    }
 
+        public bool GetIsReplaying()
+        {
+            return _gameManager.GetIsReplaying();
+        }
+
+        public int GetReplaySpeed()
+        {
+            return _gameManager.GetReplaySpeed();
+        }
+    }
 }

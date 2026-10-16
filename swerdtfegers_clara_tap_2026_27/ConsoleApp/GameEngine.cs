@@ -3,8 +3,10 @@ using activity_00_tap_26_27.Core.Events;
 using activity_00_tap_26_27.Data;
 using activity_00_tap_26_27.Render;
 using ConsoleGame;
+using ConsoleGame.Render;
 using GameLibrary;
 using GameLibrary.CSV;
+using GameLibrary.Data;
 using GameLibrary.States;
 using System;
 using System.Collections.Generic;
@@ -39,7 +41,7 @@ namespace activity_00_tap_26_27
         public GameEngine()
         {
             _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
-            _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
+            _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer());
 
             _logManager = new LogManager(_eventManager, new LogFileWriter());
 
@@ -134,7 +136,7 @@ namespace activity_00_tap_26_27
                 _gameManager.ShowMenu();
 
                 _screenRenderers.Add(typeof(MainMenuState), new MainMenuRenderer(_gameManager));
-                _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer(_gameManager));
+                _screenRenderers.Add(typeof(ExploringState), new ExploringRenderer());
                 _screenRenderers.Add(typeof(ShopOpenState), new ShopOpenRenderer());
                 _screenRenderers.Add(typeof(ShopClosedState), new ShopClosedRenderer());
 

@@ -10,7 +10,8 @@ namespace activity_00_tap_26_27.Data
         public string _name;
         
         public int _price;
-        
+        public int _quantity;
+
 
         public ItemData(string item_id, string item_name, int price)
         {
@@ -18,6 +19,8 @@ namespace activity_00_tap_26_27.Data
             _name = item_name;
            
             _price = price;
+            
+            
            
         }
     }
