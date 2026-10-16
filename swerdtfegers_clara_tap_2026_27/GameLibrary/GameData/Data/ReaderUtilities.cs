@@ -1,5 +1,4 @@
-﻿
-using GameLibrary.CSV;
+﻿using GameLibrary.Csv;
 
 namespace GameLibrary.Data
 {
