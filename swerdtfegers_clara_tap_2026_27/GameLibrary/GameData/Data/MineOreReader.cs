@@ -1,5 +1,7 @@
-﻿using System.Globalization;
-using GameLibrary.Csv;
+﻿using GameLibrary.CSV;
+using System.Collections.Generic;
+using System.Globalization;
+
 
 namespace GameLibrary.Data
 {

@@ -7,9 +7,14 @@ using System;
 
 namespace ConsoleGame.Render
 {
-    public class ExploringRenderer
+    public class ExploringRenderer : IScreenRenderer
     {
-        public void Render(IState state, ConsoleRenderManager render_manager)
+        private ConsoleRenderManager _renderManager;
+        public ExploringRenderer(ConsoleRenderManager render_manager)
+        {
+            _renderManager = render_manager;
+        }
+        public void Render(IState state)
         {
             ExploringState exploring_state = state as ExploringState;
 
@@ -22,7 +27,7 @@ namespace ConsoleGame.Render
 
             int current_line = 0;
 
-            render_manager.Draw(0, current_line++, game_in_progress_message, ConsoleColor.Magenta, ConsoleColor.Black);
+            _renderManager.Draw(0, current_line++, game_in_progress_message, ConsoleColor.Magenta, ConsoleColor.Black);
 
             LocationComponent current_location = exploring_state.GetCurrentLocation();
 
@@ -30,16 +35,16 @@ namespace ConsoleGame.Render
             HealthComponent health_component = hero.GetComponent<HealthComponent>();
             WalletComponent wallet_component = hero.GetComponent<WalletComponent>();
 
-            render_manager.Draw(0, current_line++, $"{hero.GetName()} - {health_component.GetHealth()} HP - Money: {wallet_component.GetMoney()}", ConsoleColor.Blue, ConsoleColor.DarkBlue);
+            _renderManager.Draw(0, current_line++, $"{hero.GetName()} - {health_component.GetHealth()} HP - Money: {wallet_component.GetMoney()}", ConsoleColor.Blue, ConsoleColor.DarkBlue);
 
             InventoryComponent inventory_component = hero.GetComponent<InventoryComponent>();
 
             for (int item_index = 0; item_index < inventory_component.GetEntryCount(); item_index++)
             {
-                render_manager.Draw(0, current_line++, $"{inventory_component.GetEntryAtIndex(item_index).GetItem()._name}", ConsoleColor.Blue, ConsoleColor.DarkBlue);
+                _renderManager.Draw(0, current_line++, $"{inventory_component.GetEntryAtIndex(item_index).GetItem()._name}", ConsoleColor.Blue, ConsoleColor.DarkBlue);
             }
 
-            render_manager.Draw(0, current_line++, $"Exploring {current_location.GetName()}", ConsoleColor.Cyan, ConsoleColor.Black);
+            _renderManager.Draw(0, current_line++, $"Exploring {current_location.GetName()}", ConsoleColor.Cyan, ConsoleColor.Black);
 
             for (int location_index = 0; location_index < current_location.GetDestinationCount(); location_index++)
             {
@@ -47,11 +52,11 @@ namespace ConsoleGame.Render
 
                 if (location_index == exploring_state.GetSelectedDestinationIndex())
                 {
-                    render_manager.Draw(0, current_line++, $"{location_index + 1}. {current_connection.GetDestinationLocation().GetName()}: Duration: {current_connection.GetTimeToReachDestination()}", ConsoleColor.Black, ConsoleColor.Green);
+                    _renderManager.Draw(0, current_line++, $"{location_index + 1}. {current_connection.GetDestinationLocation().GetName()}: Duration: {current_connection.GetTimeToReachDestination()}", ConsoleColor.Black, ConsoleColor.Green);
                 }
                 else
                 {
-                    render_manager.Draw(0, current_line++, $"{location_index + 1}. {current_connection.GetDestinationLocation().GetName()}: Duration: {current_connection.GetTimeToReachDestination()}", ConsoleColor.Green, ConsoleColor.Black);
+                    _renderManager.Draw(0, current_line++, $"{location_index + 1}. {current_connection.GetDestinationLocation().GetName()}: Duration: {current_connection.GetTimeToReachDestination()}", ConsoleColor.Green, ConsoleColor.Black);
                 }
             }
         }
