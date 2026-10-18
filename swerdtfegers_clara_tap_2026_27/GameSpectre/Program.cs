@@ -7,6 +7,12 @@ namespace GameSpectre
 {
     public class Program
     {
-        new GameEngine().Run();
+        static void Main(string[] args)
+        {
+            new GameEngine().Run();
+
+            
+        }
+        
     }
 }

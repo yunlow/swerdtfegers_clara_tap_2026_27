@@ -10,11 +10,16 @@ namespace ConsoleGame.Render
 {
     public class SpectreExploringRenderer
     {
+        private readonly string _gameDataPath;
+        public SpectreExploringRenderer(string gameDataPath)
+        {
+            _gameDataPath = gameDataPath;
+        }
         public void Render(IState state, ConsoleRenderManager render_manager)
         {
             ExploringState exploring_state = state as ExploringState;
 
-            Panel panel = new Panel(art_text);
+            Panel panel = new Panel(_gameDataPath);
             
 
 
